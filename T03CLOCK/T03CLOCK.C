@@ -58,10 +58,43 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   return 0;
 } /* End of 'WinMain' function */
 
+/* Draw clock hand function */
+VOID DrawHand( HDC hDC, INT X0, INT Y0, DOUBLE AngleInRadian, INT L, INT W, COLORREF Color )
+{
+  INT i;
+  HPEN hPenOld;
+  HBRUSH hBrOld;
+  POINT pnts[] = 
+  {
+    {0, L}, {W, 0}, {0, -W}, {-W, 0}
+  }, pnts1[sizeof(pnts) / sizeof(pnts[0])];
+
+  /*Transform hand shape */
+  for (i = 0; i < sizeof(pnts) / sizeof(pnts[0]); i++)
+  {
+    pnts1[i].x = X0 + pnts[i].x * cos(AngleInRadian) + pnts[i].y * sin(AngleInRadian);
+    pnts1[i].y = Y0 - (pnts[i].y * cos(AngleInRadian) - pnts[i].x * sin(AngleInRadian));
+  }
+
+  hPenOld = SelectObject(hDC, GetStockObject(NULL_PEN));
+  hBrOld = SelectObject(hDC, GetStockObject(DC_BRUSH));
+
+  SetDCPenColor(hDC, RGB(255, 0, 0));
+  SetDCBrushColor(hDC, Color);
+
+  Polygon(hDC, pnts1, sizeof(pnts) / sizeof(pnts[0]));
+
+  SelectObject(hDC, hPenOld);
+  SelectObject(hDC, hBrOld);
+}/* End of 'DrawHand' function */
 
 /* Main window handle function */
 LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
+  INT r;
+  DOUBLE a;
+  SYSTEMTIME st;
+  HPEN hPen, hPenOld;
   HDC hDC;
   PAINTSTRUCT ps;
   BITMAP bm;
@@ -106,13 +139,34 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
 
     /* Draw clockface */
+    r = (w < h ? w : h);
     GetObject(hBmImage, sizeof(bm), &bm);
-    BitBlt(hMemDC, 0, 0, bm.bmWidth, bm.bmHeight, hMemDCImage, 0, 0, SRCCOPY);
+    /* BitBlt(hMemDC, 0, 0, bm.bmWidth, bm.bmHeight, hMemDCImage, 0, 0, SRCCOPY); */
+    SetStretchBltMode(hMemDC, COLORONCOLOR);
+    StretchBlt(hMemDC, w / 2 - r / 2, h / 2 - r / 2, r, r, hMemDCImage, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
 
+    /* Draw hands */
+    GetLocalTime(&st);
+
+    hPen = CreatePen(PS_SOLID, 8, RGB(255, 0, 255));
+    hPenOld = SelectObject(hMemDC, hPen);
+    /*MoveToEx(hMemDC, w / 2, h/2, NULL);
+    a = (st.wSecond + st.wMilliseconds / 1000.0) * 2 * PI / 60.0;
+    LineTo(hMemDC, w / 2 + 0.32 * r * sin(a), h/2 - 0.32 * r * cos(a));*/
+
+    DrawHand(hMemDC, w / 2, h/2, (st.wHour % 12 + st.wMinute / 60.0) * 2 * PI / 12.0, r *0.18, 30, RGB(0, 0, 0));
+    DrawHand(hMemDC, w / 2, h/2, (st.wMinute + st.wSecond / 60.0) * 2 * PI / 60.0, r *0.30, 18, RGB(0, 0, 0));
+    DrawHand(hMemDC, w / 2, h/2, (st.wSecond + st.wMilliseconds / 1000.0) * 2 * PI / 60.0, r *0.47, 13, RGB(0, 0, 0));
+    
+    SelectObject(hMemDC, hPenOld);
+    DeleteObject(hPen);
+
+    /* Send repaint message */
     InvalidateRect(hWnd, NULL, FALSE);
     return 0;
   case WM_PAINT:
     hDC = BeginPaint(hWnd, &ps);
+    /* Copy frame to window */
     BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
     EndPaint(hWnd, &ps);
     return 0;
@@ -122,11 +176,13 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
       DestroyWindow(hWnd);
     return 0;
   case WM_DESTROY:
+    /* Delete resourses */
     if (hBm != NULL)
       DeleteObject(hBm);
     DeleteDC(hMemDC);
     DeleteObject(hBmImage);
     DeleteDC(hMemDCImage);
+    
     PostMessage(hWnd, WM_QUIT, 0, 0);
     KillTimer(hWnd, 30);
     return 0;
