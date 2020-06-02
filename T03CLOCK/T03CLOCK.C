@@ -1,8 +1,11 @@
-/* Gekht Milana, 01.06.2020 */
+/* Gekht Milana, 02.06.2020 */
 
 #include <stdlib.h>
 #include <windows.h>
 #include <math.h>
+
+/* Pi math constant */
+#define PI 3.14159265358979323846
 
 /* Window class name */
 #define WND_CLASS_NAME "Clock"
@@ -39,10 +42,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   /* Window creation */
   hWnd = CreateWindow(WND_CLASS_NAME,
     WND_CLASS_NAME,
-    WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-    /* CW_USEDEFAULT, CW_USEDEFAULT,
-    CW_USEDEFAULT, CW_USEDEFAULT, */
-    47 , 47, 47 * 20, 30 * 20,
+    WS_OVERLAPPEDWINDOW,
+    CW_USEDEFAULT, CW_USEDEFAULT,
+    CW_USEDEFAULT, CW_USEDEFAULT,
+    /* 47 , 47, 47 * 20, 30 * 20,*/
     NULL, NULL, hInstance, NULL);
 
   /* Show and update window */
@@ -55,47 +58,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   return 0;
 } /* End of 'WinMain' function */
 
-/* Draw eye function */
-/*VOID DrawEye(HDC hDC, INT X, INT Y, INT R, INT R1, INT Mx, INT My )
-{
-  INT
-    dx = Mx - X, dy = My - Y, delta = R - R1;
-  DOUBLE
-    len = sqrt(dx * dx + dy * dy), t;  */
-
-  /* Big circle */
-  /*SelectObject(hDC, GetStockObject(DC_BRUSH));
-  SelectObject(hDC, GetStockObject(DC_PEN));
-  SetDCPenColor(hDC, RGB(0, 0, 0));
-  SetDCBrushColor(hDC, RGB(255, 255, 255));
-  Ellipse(hDC, X - R, Y - R, X + R + 1, Y + R + 1); */
-
-  /* Small circle */
-  /*SelectObject(hDC, GetStockObject(DC_BRUSH));
-  SelectObject(hDC, GetStockObject(DC_PEN));
-  SetDCPenColor(hDC, RGB(0, 0, 0));
-  SetDCBrushColor(hDC, RGB(168, 0, 2)); 
-
-  if (len == 0)
-    t = 0;
-  else if (delta > len)
-    t = 0;
-  else
-    t = delta / len;
-  dx *= t;
-  dy *= t;
-  Ellipse(hDC, X + dx - R1, Y + dy - R1, X + dx + R1 + 1, Y + dy + R1 + 1);
-}*//* End of 'DrawEye' function */
 
 /* Main window handle function */
 LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-  INT i, j, r, r1;
   HDC hDC;
   PAINTSTRUCT ps;
-  POINT pt;
   BITMAP bm;
-  HPEN hPen, hOldPen;
   static HDC hMemDC, hMemDCImage;
   static HBITMAP hBm, hBmImage;
   static INT w, h;
@@ -167,4 +136,4 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 
 } /* End of 'WinFunc' function */
 
-/* END OF 'T02EYES.C' FILE */
+/* END OF 'T03CLOCK.C' FILE */
