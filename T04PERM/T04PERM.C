@@ -6,10 +6,10 @@
 
 #include<stdio.h>
 #include <windows.h>
-#define MAX 3
+#define MAX 5
 
 /* Permutation array */
-BOOL IsParity; 
+BOOL IsParity = 1; 
 INT P[MAX];
 
 VOID Store( VOID );
