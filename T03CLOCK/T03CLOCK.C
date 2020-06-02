@@ -88,22 +88,73 @@ VOID DrawHand( HDC hDC, INT X0, INT Y0, DOUBLE AngleInRadian, INT L, INT W, COLO
   SelectObject(hDC, hBrOld);
 }/* End of 'DrawHand' function */
 
+/* Toggle window fullscreen mode function */
+VOID FlipFullScreen( HWND hWnd )
+{
+  static BOOL IsFullScreen = FALSE;
+  static RECT SaveRect;
+
+  if (!IsFullScreen)
+  {
+    HMONITOR hmon;
+    MONITORINFO moninfo;
+    RECT rc;
+
+    /* Go to fullscreen mode */
+    GetWindowRect(hWnd, &SaveRect);
+
+    /* Get nearest monitor */
+    hmon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+
+    /* Get monitor information */
+    moninfo.cbSize = sizeof(moninfo);
+    GetMonitorInfo(hmon, &moninfo);
+
+    rc = moninfo.rcMonitor;
+    AdjustWindowRect(&rc, GetWindowLong(hWnd, GWL_STYLE), FALSE);
+    SetWindowPos(hWnd, HWND_TOP,
+      rc.left, rc.top,
+      rc.right - rc.left, rc.bottom - rc.top,
+      SWP_NOOWNERZORDER);
+  }
+  else
+  {
+    /* Restore window size and position */
+    SetWindowPos(hWnd, HWND_TOP,
+      SaveRect.left, SaveRect.top,
+      SaveRect.right - SaveRect.left, SaveRect.bottom - SaveRect.top,
+      SWP_NOOWNERZORDER);
+  }
+} /* End of 'FlipFullScreen' function */
+
+
 /* Main window handle function */
 LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-  INT r;
+  INT r, len;
   DOUBLE a;
+  CHAR Buf[102];
   SYSTEMTIME st;
   HPEN hPen, hPenOld;
+  HFONT hFnt, hFntOld;
   HDC hDC;
+  RECT rc;
   PAINTSTRUCT ps;
   BITMAP bm;
   static HDC hMemDC, hMemDCImage;
   static HBITMAP hBm, hBmImage;
   static INT w, h;
+  static CHAR *WD[] =
+  {
+    "бя", "ом", "бр", "яп", "вр", "ор", "яа"
+  };
 
   switch (Msg)
   {
+  case WM_GETMINMAXINFO:
+    ((MINMAXINFO *)lParam)->ptMaxTrackSize.y =
+      GetSystemMetrics(SM_CYMAXTRACK) + GetSystemMetrics(SM_CYCAPTION) + 2 * GetSystemMetrics(SM_CYBORDER);
+    return 0;
   case WM_CREATE:
     hBmImage = LoadImage(NULL, "clockface.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
@@ -116,20 +167,31 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     hBm = NULL;
     return 0;
   case WM_SIZE:
+    /* Obtain new window width and height */
+
     w = LOWORD(lParam);
     h = HIWORD(lParam);
 
+    /* Recreate background frame image */
     if (hBm != NULL)
       DeleteObject(hBm);
     hDC = GetDC(hWnd);
     hBm = CreateCompatibleBitmap(hDC, w, h);
     ReleaseDC(hWnd, hDC);
     SelectObject(hMemDC, hBm);
+
+    /* Redraw frame */
     SendMessage(hWnd, WM_TIMER, 0, 0);
+    return 0;
+  case WM_SYSKEYDOWN:
+    if (wParam == VK_RETURN)
+      FlipFullScreen(hWnd);
     return 0;
   case WM_KEYDOWN:
     if (wParam == VK_ESCAPE)
       SendMessage(hWnd, WM_CLOSE, 0, 0);
+    else if (wParam == 'F')
+      FlipFullScreen(hWnd);
     return 0;
   case WM_TIMER:
     srand(102); 
@@ -154,12 +216,33 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     a = (st.wSecond + st.wMilliseconds / 1000.0) * 2 * PI / 60.0;
     LineTo(hMemDC, w / 2 + 0.32 * r * sin(a), h/2 - 0.32 * r * cos(a));*/
 
-    DrawHand(hMemDC, w / 2, h/2, (st.wHour % 12 + st.wMinute / 60.0) * 2 * PI / 12.0, r *0.18, 30, RGB(0, 0, 0));
+    DrawHand(hMemDC, w / 2, h/2, (st.wHour % 12 + st.wMinute / 60.0) * 2 * PI / 12.0, r *0.26, 24, RGB(0, 0, 0));
     DrawHand(hMemDC, w / 2, h/2, (st.wMinute + st.wSecond / 60.0) * 2 * PI / 60.0, r *0.30, 18, RGB(0, 0, 0));
     DrawHand(hMemDC, w / 2, h/2, (st.wSecond + st.wMilliseconds / 1000.0) * 2 * PI / 60.0, r *0.47, 13, RGB(0, 0, 0));
     
     SelectObject(hMemDC, hPenOld);
     DeleteObject(hPen);
+
+    /* Output text */
+    hFnt = CreateFont(r / 18, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+             RUSSIAN_CHARSET,
+             OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
+             FF_DECORATIVE | VARIABLE_PITCH, "Consolas");
+    hFntOld = SelectObject(hMemDC, hFnt);
+    len = wsprintf(Buf, "%02i.%02i.%i\n(%s)",
+            st.wDay, st.wMonth, st.wYear, WD[st.wDayOfWeek]);
+
+    SetBkMode(hMemDC, TRANSPARENT);
+    SetTextColor(hMemDC, RGB(0, 0, 0));
+    /* TextOut(hMemDCFrame, w / 2, h / 2, Buf, len); */
+    rc.left = 0;
+    rc.right = w;
+    rc.top = 2* h / 3;
+    rc.bottom = h;
+    DrawText(hMemDC, Buf, len, &rc, DT_CENTER | DT_VCENTER);
+
+    SelectObject(hMemDC, hFntOld);
+    DeleteObject(hFnt);
 
     /* Send repaint message */
     InvalidateRect(hWnd, NULL, FALSE);
