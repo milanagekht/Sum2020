@@ -6,10 +6,12 @@
 
 #include <math.h>
 #include <time.h>
+#include <stdio.h>
 
 #include <windows.h>
 
 #include "GLOBE.H"
+#include "TIMER.H"
 
 
 /* Geometry data arfray */
@@ -78,6 +80,7 @@ VOID DrawGlobe( HDC hDC )
   DBL t = clock() / CLOCKS_PER_SEC;
   static POINT pnts[N][M];
   static DBL z[N][M];
+  /*CHAR Buf[102];*/
 
   SelectObject(hDC, GetStockObject(NULL_PEN));
   SelectObject(hDC, GetStockObject(DC_BRUSH));
@@ -122,6 +125,7 @@ VOID DrawGlobe( HDC hDC )
      }*/
      SelectObject(hDC, GetStockObject(DC_PEN));
      SelectObject(hDC, GetStockObject(DC_BRUSH));
+     /*SetDCPenColor(hDC, RGB(46, 147, 152));*/
      SetDCPenColor(hDC, RGB(0, 0, 0));
      srand(102);
      for (k = 0; k < 2; k++)
@@ -136,7 +140,7 @@ VOID DrawGlobe( HDC hDC )
        p[2] = pnts[i + 1][j + 1];
        p[3] = pnts[i + 1][j];
 
-       /*SetDCBrushColor(hDC, RGB(46, 147, 152)); */
+       /*SetDCBrushColor(hDC, RGB(0, 0, 0));*/ 
        SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256));
        sign =
            (p[0].x - p[1].x) * (p[0].y + p[1].y) +
@@ -147,7 +151,8 @@ VOID DrawGlobe( HDC hDC )
         Polygon(hDC, p, 4);
      }
 
-
+     /*SetTextColor(hDC, RGB(2, 5, 55));
+     TextOut(hDC, 200, 200, Buf, sprintf(Buf, "Frames Per Sec: %f", GLB_FPS));*/
 
 
 } /* End of Draw function */ 
