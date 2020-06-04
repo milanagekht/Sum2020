@@ -5,14 +5,53 @@
  */
 
 #include <math.h>
+#include <time.h>
+
 #include <windows.h>
-#include <math.h>
 
 #include "GLOBE.H"
 
 
+/* Geometry data arfray */
+static VEC Geom[N][M];
 
-VEC Gem[N][M];
+/* Store coordinate system center */
+static INT CenterX, CenterY;
+
+VEC VecRotateZ( VEC V, DBL Angle )
+{
+  VEC r;
+
+  Angle *= PI / 180;
+  r.X = V.X * cos(Angle) - V.Y * sin(Angle);
+  r.Y = V.X * sin(Angle) + V.Y * cos(Angle);
+  r.Z = V.Z;
+  return r;
+}
+
+VEC VecRotateY( VEC V, DBL Angle )
+{
+  VEC r;
+
+  Angle *= PI / 180;
+  r.Z = V.Z * cos(Angle) - V.X * sin(Angle);
+  r.X = V.Z * sin(Angle) + V.X * cos(Angle);
+  r.Y = V.Y;
+  return r;
+}
+
+VEC VecRotateX( VEC V, DBL Angle )
+{
+  VEC r;
+
+  Angle *= PI / 180;
+  r.Y = V.Y * cos(Angle) - V.Z * sin(Angle);
+  r.Z = V.Y * sin(Angle) - V.Z * cos(Angle);
+  r.X = V.X;
+  return r;
+}
+
+
 
 VOID GlobeSet( DBL Xc, DBL Yc, DBL R )
 {
@@ -20,12 +59,14 @@ VOID GlobeSet( DBL Xc, DBL Yc, DBL R )
   DBL theta;
   DBL phi;
    
+  CenterX = Xc;
+  CenterY = Yc;
   for (i = 0, theta = 0; i < N; i++, theta += PI / (N - 1))
     for (j = 0, phi = 0; j < M; j++, phi += 2 * PI / (M - 1))
     {
-      Gem[i][j].X = R * sin(theta) * sin(phi);
-      Gem[i][j].Y = R * cos(theta);
-      Gem[i][j].Z = R * sin(theta) * cos(phi);
+      Geom[i][j].X = R * sin(theta) * sin(phi);
+      Geom[i][j].Y = R * cos(theta);
+      Geom[i][j].Z = R * sin(theta) * cos(phi);
     }
 } 
 
@@ -33,26 +74,80 @@ VOID GlobeSet( DBL Xc, DBL Yc, DBL R )
 
 VOID DrawGlobe( HDC hDC )
 {
-  POINT Geom[N][M];
-  int i, j, s = 3;
+  int i, j, k, s = 3;
+  DBL t = clock() / CLOCKS_PER_SEC;
+  static POINT pnts[N][M];
+  static DBL z[N][M];
 
-     for(i = 0; i < N; i++)
-       for (j = 0; j < M; j++)
-       {
-         Ellipse(hDC, Geom[i][j].x - s, Geom[i][j].y - s, Geom[i][j].x + s, Geom[i][j].y + s);
-       }
+  SelectObject(hDC, GetStockObject(NULL_PEN));
+  SelectObject(hDC, GetStockObject(DC_BRUSH));
+  SetDCBrushColor(hDC, RGB(55, 55, 55));
+
+   for(i = 0; i < N; i++)
+     for (j = 0; j < M; j++)
+     {
+       VEC 
+         v1 = VecRotateZ(Geom[i][j], 30 * t),
+         v = VecRotateX(v1, 30);
+
+       z[i][j] = v.Z;
+       pnts[i][j].x = CenterX + (INT)v.X,
+       pnts[i][j].y = CenterY - (INT)v.Y;
+     }
+     /* Drawing all points */
+  /*SelectObject(hDC, GetStockObject(NULL_PEN));
+  SelectObject(hDC, GetStockObject(DC_BRUSH));
+  SetDCBrushColor(hDC, RGB(55, 55, 55));
+       for(i = 0; i < N; i++)
+         for (j = 0; j < M; j++)
+           if (z[i][j] > 0)
+             Ellipse(hDC, pnts[i][j].x - s, pnts[i][j].y - s, pnts[i][j].x + s, pnts[i][j].y + s);
+       */
      /* Drawing horisontal lines */
+  /*SelectObject(hDC, GetStockObject(BLACK_PEN));
+  SelectObject(hDC, GetStockObject(DC_BRUSH));
+  SetDCBrushColor(hDC, RGB(55, 55, 55));
+  for (i = 0; i < N; i++)
+    {
+      MoveToEx(hDC, pnts[i][0].x, pnts[i][0].y, NULL);
+      for (j = 1; j < M; j++) 
+        LineTo(hDC, pnts[i][j].x, pnts[i][j].y);
+    } */
+       /* Drawing vertical lines */
+    /*for (j = 0; j < M; j++) 
+    {
+      MoveToEx(hDC, pnts[0][j].x, pnts[0][j].y, NULL);
       for (i = 0; i < N; i++)
-      {
-        MoveToEx(hDC, Geom[i][0].x, Geom[i][0].y, 0);
-        for (j = 1; j < M; j++) 
-          LineTo(hDC, Geom[i][j].x, Geom[i][j].y);
-      }
-         /* Drawing vertical lines */
-      for (j = 0; j < M; j++) 
-      {
-        MoveToEx(hDC, Geom[0][j].x, Geom[0][j].y, 0);
-        for (i = 1; i < N; i++)
-          LineTo(hDC, Geom[i][j].x, Geom[i][j].y);
-       }
+        LineTo(hDC, pnts[i][j].x, pnts[i][j].y);
+     }*/
+     SelectObject(hDC, GetStockObject(DC_PEN));
+     SelectObject(hDC, GetStockObject(DC_BRUSH));
+     SetDCPenColor(hDC, RGB(0, 0, 0));
+     srand(102);
+     for (k = 0; k < 2; k++)
+     for(i = 0; i < N - 1; i++)
+     for (j = 0; j < M - 1; j++)
+     { 
+       POINT p[4];
+       INT sign;
+
+       p[0] = pnts[i][j];
+       p[1] = pnts[i][j + 1];
+       p[2] = pnts[i + 1][j + 1];
+       p[3] = pnts[i + 1][j];
+
+       /*SetDCBrushColor(hDC, RGB(46, 147, 152)); */
+       SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256));
+       sign =
+           (p[0].x - p[1].x) * (p[0].y + p[1].y) +
+           (p[1].x - p[2].x) * (p[1].y + p[2].y) +
+           (p[2].x - p[3].x) * (p[2].y + p[3].y) +
+           (p[3].x - p[0].x) * (p[3].y + p[0].y);
+       if (k == 0 && sign <= 0 || k == 1 && sign > 0)
+        Polygon(hDC, p, 4);
+     }
+
+
+
+
 } /* End of Draw function */ 

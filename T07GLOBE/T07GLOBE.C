@@ -55,8 +55,17 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   ShowWindow(hWnd, CmdShow);
 
   /* Message loop */
-  while (GetMessage(&msg, NULL, 0, 0))
-    DispatchMessage(&msg); 
+  /*while (GetMessage(&msg, NULL, 0, 0))
+    DispatchMessage(&msg); */
+  while (TRUE)
+    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    {
+      if (msg.message == WM_QUIT)
+        break;
+      DispatchMessage(&msg);
+    }
+    else
+      SendMessage(hWnd, WM_TIMER, 47, 0);
 
   return 0;
 } /* End of 'WinMain' function */
@@ -120,13 +129,12 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
       GetSystemMetrics(SM_CYMAXTRACK) + GetSystemMetrics(SM_CYCAPTION) + 2 * GetSystemMetrics(SM_CYBORDER);
     return 0;
   case WM_CREATE:
-    SetTimer(hWnd, 30, 102, NULL);
+    SetTimer(hWnd, 30, 2, NULL);
     hDC = GetDC(hWnd);
     hMemDC = CreateCompatibleDC(hDC);
     ReleaseDC(hWnd, hDC);
     hBm = NULL;
-    GlobeSet(w / 2, h / 2, (w < h ? w : h) * 0.8); 
-
+     
     return 0;
   case WM_SIZE:
     /* Obtain new window width and height */
@@ -143,6 +151,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     SelectObject(hMemDC, hBm);
 
     /* Redraw frame */
+    GlobeSet(w / 2, h / 2, (w < h ? w : h) * 0.5);
     SendMessage(hWnd, WM_TIMER, 0, 0);
     return 0;
   case WM_SYSKEYDOWN:
@@ -157,14 +166,12 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_TIMER: 
     /* Clear backgrond */
-    SelectObject(hMemDC, GetStockObject(WHITE_BRUSH));
+    SelectObject(hMemDC, GetStockObject(BLACK_BRUSH));
     SelectObject(hMemDC, GetStockObject(NULL_PEN));
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
 
     /* Draw Globe */
-    SelectObject(hMemDC, GetStockObject(BLACK_PEN));
     DrawGlobe(hMemDC);
-    /*Ellipse(hDC, 2, 2, 2, 2);*/
 
     /* Send repaint message */
     InvalidateRect(hWnd, NULL, FALSE);
