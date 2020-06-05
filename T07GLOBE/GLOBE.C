@@ -93,27 +93,27 @@ VOID DrawGlobe( HDC hDC )
   /*m = MatrView(VecSet(GLB_Time * 0.26, GLB_Time * 2,5), 
                VecSet(0, 2, 0), 
                VecSet(0, 1, 0));*/
-   for(i = 0; i < N; i++)
-     for (j = 0; j < M; j++)
-     {
-       VEC 
-         /*v1 = VecRotateZ(Geom[i][j], 30 * t),*/
-         v = PointTransform(Geom[i][j], m) ;
+  for(i = 0; i < N; i++)
+    for (j = 0; j < M; j++)
+    {
+      VEC 
+        /*v1 = VecRotateZ(Geom[i][j], 30 * t),*/
+        v = PointTransform(Geom[i][j], m) ;
 
-       z[i][j] = v.Z;
-       pnts[i][j].x = CenterX + (INT)v.X,
-       pnts[i][j].y = CenterY - (INT)v.Y;
-     }
-     /* Drawing all points */
+      z[i][j] = v.Z;
+      pnts[i][j].x = CenterX + (INT)v.X,
+      pnts[i][j].y = CenterY - (INT)v.Y;
+    }
+    /* Drawing all points */
   /*SelectObject(hDC, GetStockObject(NULL_PEN));
   SelectObject(hDC, GetStockObject(DC_BRUSH));
   SetDCBrushColor(hDC, RGB(55, 55, 55));
-       for(i = 0; i < N; i++)
-         for (j = 0; j < M; j++)
-           if (z[i][j] > 0)
-             Ellipse(hDC, pnts[i][j].x - s, pnts[i][j].y - s, pnts[i][j].x + s, pnts[i][j].y + s);
-       */
-     /* Drawing horisontal lines */
+      for(i = 0; i < N; i++)
+        for (j = 0; j < M; j++)
+          if (z[i][j] > 0)
+            Ellipse(hDC, pnts[i][j].x - s, pnts[i][j].y - s, pnts[i][j].x + s, pnts[i][j].y + s);
+      */
+    /* Drawing horisontal lines */
   /*SelectObject(hDC, GetStockObject(BLACK_PEN));
   SelectObject(hDC, GetStockObject(DC_BRUSH));
   SetDCBrushColor(hDC, RGB(55, 55, 55));
@@ -123,44 +123,44 @@ VOID DrawGlobe( HDC hDC )
       for (j = 1; j < M; j++) 
         LineTo(hDC, pnts[i][j].x, pnts[i][j].y);
     } */
-       /* Drawing vertical lines */
+      /* Drawing vertical lines */
     /*for (j = 0; j < M; j++) 
     {
       MoveToEx(hDC, pnts[0][j].x, pnts[0][j].y, NULL);
       for (i = 0; i < N; i++)
         LineTo(hDC, pnts[i][j].x, pnts[i][j].y);
-     }*/
-     SelectObject(hDC, GetStockObject(DC_PEN));
-     SelectObject(hDC, GetStockObject(DC_BRUSH));
-     /*SetDCPenColor(hDC, RGB(46, 147, 152));*/
-     SetDCPenColor(hDC, RGB(0, 0, 0));
-     srand(102);
-     for (k = 0; k < 2; k++)
-     for(i = 0; i < N - 1; i++)
-     for (j = 0; j < M - 1; j++)
-     { 
-       POINT p[4];
-       INT sign;
+    }*/
+    SelectObject(hDC, GetStockObject(DC_PEN));
+    SelectObject(hDC, GetStockObject(DC_BRUSH));
+    /*SetDCPenColor(hDC, RGB(46, 147, 152));*/
+    SetDCPenColor(hDC, RGB(0, 0, 0));
+    /*srand(102);*/
+    for (k = 0; k < 2; k++)
+      for(i = 0; i < N - 1; i++)
+        for (j = 0; j < M - 1; j++)
+        { 
+          POINT p[4];
+          INT sign;
 
-       p[0] = pnts[i][j];
-       p[1] = pnts[i][j + 1];
-       p[2] = pnts[i + 1][j + 1];
-       p[3] = pnts[i + 1][j];
+          p[0] = pnts[i][j];
+          p[1] = pnts[i][j + 1];
+          p[2] = pnts[i + 1][j + 1];
+          p[3] = pnts[i + 1][j];
 
-       /*SetDCBrushColor(hDC, RGB(0, 0, 0));*/ 
-       /*SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256)); */
-       SetDCBrushColor(hDC, RGB( (i * 46 / N), (i * 147 / N), (i * 152 / N)));
-       sign =
-           (p[0].x - p[1].x) * (p[0].y + p[1].y) +
-           (p[1].x - p[2].x) * (p[1].y + p[2].y) +
-           (p[2].x - p[3].x) * (p[2].y + p[3].y) +
-           (p[3].x - p[0].x) * (p[3].y + p[0].y);
-       if (k == 0 && sign <= 0 || k == 1 && sign > 0)
-        Polygon(hDC, p, 4);
-     }
+          /*SetDCBrushColor(hDC, RGB(0, 0, 0));*/ 
+          /*SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256)); */
+          SetDCBrushColor(hDC, RGB( (i * 46 / N), (i * 147 / N), (i * 152 / N)));
+          sign =
+            (p[0].x - p[1].x) * (p[0].y + p[1].y) +
+            (p[1].x - p[2].x) * (p[1].y + p[2].y) +
+            (p[2].x - p[3].x) * (p[2].y + p[3].y) +
+            (p[3].x - p[0].x) * (p[3].y + p[0].y);
+          if (k == 0 && sign <= 0 || k == 1 && sign > 0)
+          Polygon(hDC, p, 4);
+         }
 
-     SetTextColor(hDC, RGB(2, 5, 55));
-     TextOut(hDC, 8, 8, Buf, sprintf(Buf, "Frames Per Sec: %.2f", GLB_FPS));
+    SetTextColor(hDC, RGB(2, 5, 55));
+    TextOut(hDC, 8, 8, Buf, sprintf(Buf, "Frames Per Sec: %.2f", GLB_FPS));
 
 
 } /* End of Draw function */ 
