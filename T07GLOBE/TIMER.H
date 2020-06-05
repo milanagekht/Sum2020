@@ -1,3 +1,8 @@
+ /* FILE NAME: TIMER.H
+ * PROGRAMMER: MG5
+ * DATE: 04.06.2020 
+ * PURPOSE: NONE
+ */
 
 #include <windows.h>
 

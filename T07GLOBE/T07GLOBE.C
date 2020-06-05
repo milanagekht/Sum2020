@@ -161,14 +161,14 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     SendMessage(hWnd, WM_TIMER, 0, 0);
     return 0;
   case WM_SYSKEYDOWN:
-    if (wParam == VK_RETURN)
+    if (wParam == 'F')
       FlipFullScreen(hWnd);
     return 0;
   case WM_KEYDOWN:
     if (wParam == VK_ESCAPE)
       SendMessage(hWnd, WM_CLOSE, 0, 0);
-    else if (wParam == 'F')
-      FlipFullScreen(hWnd);
+    else if (wParam == 'P')
+      GLB_IsPause = !GLB_IsPause;
     return 0;
   case WM_TIMER: 
     /* Clear backgrond */
@@ -180,7 +180,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     DrawGlobe(hMemDC);
 
     /* Text output */
-     hFnt = CreateFont(h / 32, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+    hFnt = CreateFont(h / 32, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
              RUSSIAN_CHARSET,
              OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
              FF_ROMAN | VARIABLE_PITCH, "Consolas");
@@ -188,6 +188,8 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     len = sprintf(Buf, "Frames Per Sec: %f", GLB_FPS);
 
     SetBkMode(hMemDC, OPAQUE);
+    /*SetBkMode(hMemDC, TRANSPARENT);
+    SetTextColor(hMemDC, RGB(255, 255, 255));
     SetTextColor(hMemDC, RGB(0, 0, 0));
     /*TextOut(hMemDC, w / 2, h / 2, Buf, len); */
     rc.left = 0;
