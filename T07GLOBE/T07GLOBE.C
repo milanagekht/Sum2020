@@ -11,6 +11,7 @@
 
 #include "GLOBE.H"
 #include "TIMER.H"
+#include "MTH.H"
 
 /* Window class name */
 #define WND_CLASS_NAME "Globe"
@@ -117,15 +118,15 @@ VOID FlipFullScreen( HWND hWnd )
 /* Main window handle function */
 LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-  INT len;
+  /*INT len;*/
   HDC hDC;
   RECT rc;
   PAINTSTRUCT ps;
-  HFONT hFnt, hFntOld;
+  /*HFONT hFnt, hFntOld; */
   static HDC hMemDC;
   static HBITMAP hBm;
   static INT w, h;
-  CHAR Buf[102];
+  /*CHAR Buf[102];*/
 
   switch (Msg)
   {
@@ -157,18 +158,16 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     SelectObject(hMemDC, hBm);
 
     /* Redraw frame */
-    GlobeSet(w / 2, h / 2, (w < h ? w : h) * 0.5);
+    GlobeSet(w / 2, h / 2, (w < h ? w : h) * 0.4);
     SendMessage(hWnd, WM_TIMER, 0, 0);
-    return 0;
-  case WM_SYSKEYDOWN:
-    if (wParam == 'F')
-      FlipFullScreen(hWnd);
     return 0;
   case WM_KEYDOWN:
     if (wParam == VK_ESCAPE)
       SendMessage(hWnd, WM_CLOSE, 0, 0);
-    else if (wParam == 'P')
+    if (wParam == 'P')
       GLB_IsPause = !GLB_IsPause;
+    if (wParam == 'F')
+      FlipFullScreen(hWnd);
     return 0;
   case WM_TIMER: 
     /* Clear backgrond */
@@ -180,26 +179,26 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     DrawGlobe(hMemDC);
 
     /* Text output */
-    hFnt = CreateFont(h / 32, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+    /*hFnt = CreateFont(h / 32, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
              RUSSIAN_CHARSET,
              OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
              FF_ROMAN | VARIABLE_PITCH, "Consolas");
     hFntOld = SelectObject(hMemDC, hFnt);
     len = sprintf(Buf, "Frames Per Sec: %f", GLB_FPS);
 
-    SetBkMode(hMemDC, OPAQUE);
+    SetBkMode(hMemDC, OPAQUE);*/
     /*SetBkMode(hMemDC, TRANSPARENT);
     SetTextColor(hMemDC, RGB(255, 255, 255));
     SetTextColor(hMemDC, RGB(0, 0, 0));
     /*TextOut(hMemDC, w / 2, h / 2, Buf, len); */
-    rc.left = 0;
+    /*rc.left = 0;
     rc.right = w;
     rc.top = 2 * h / 3;
     rc.bottom = h;
     DrawText(hMemDC, Buf, len, &rc, DT_CENTER | DT_VCENTER);
 
     SelectObject(hMemDC, hFntOld);
-    DeleteObject(hFnt); 
+    DeleteObject(hFnt);*/ 
 
     GLB_TimerResponse();
 

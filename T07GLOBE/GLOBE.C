@@ -61,8 +61,8 @@ VOID GlobeSet( DBL Xc, DBL Yc, DBL R )
   DBL theta;
   DBL phi;
    
-  CenterX = Xc;
-  CenterY = Yc;
+  CenterX = (INT)Xc;
+  CenterY = (INT)Yc;
   for (i = 0, theta = 0; i < N; i++, theta += PI / (N - 1))
     for (j = 0, phi = 0; j < M; j++, phi += 2 * PI / (M - 1))
     {
@@ -80,18 +80,25 @@ VOID DrawGlobe( HDC hDC )
   DBL t = clock() / CLOCKS_PER_SEC;
   static POINT pnts[N][M];
   static DBL z[N][M];
-  /*CHAR Buf[102];*/
+  CHAR Buf[102];
+  MATR m;
 
   SelectObject(hDC, GetStockObject(NULL_PEN));
   SelectObject(hDC, GetStockObject(DC_BRUSH));
   SetDCBrushColor(hDC, RGB(55, 55, 55));
 
+  m = MatrMulMatr3(MatrRotateY(GLB_Time * 8), 
+                   MatrRotateX(GLB_Time * 8), 
+                   MatrRotate(sin(GLB_Time) * 30, VecSet(1, 1, 1)));
+  /*m = MatrView(VecSet(GLB_Time * 0.26, GLB_Time * 2,5), 
+               VecSet(0, 2, 0), 
+               VecSet(0, 1, 0));*/
    for(i = 0; i < N; i++)
      for (j = 0; j < M; j++)
      {
        VEC 
-         v1 = VecRotateZ(Geom[i][j], 30 * t),
-         v = VecRotateX(v1, 30);
+         /*v1 = VecRotateZ(Geom[i][j], 30 * t),*/
+         v = PointTransform(Geom[i][j], m) ;
 
        z[i][j] = v.Z;
        pnts[i][j].x = CenterX + (INT)v.X,
@@ -141,7 +148,8 @@ VOID DrawGlobe( HDC hDC )
        p[3] = pnts[i + 1][j];
 
        /*SetDCBrushColor(hDC, RGB(0, 0, 0));*/ 
-       SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256));
+       /*SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256)); */
+       SetDCBrushColor(hDC, RGB( (i * 46 / N), (i * 147 / N), (i * 152 / N)));
        sign =
            (p[0].x - p[1].x) * (p[0].y + p[1].y) +
            (p[1].x - p[2].x) * (p[1].y + p[2].y) +
@@ -151,8 +159,8 @@ VOID DrawGlobe( HDC hDC )
         Polygon(hDC, p, 4);
      }
 
-     /*SetTextColor(hDC, RGB(2, 5, 55));
-     TextOut(hDC, 200, 200, Buf, sprintf(Buf, "Frames Per Sec: %f", GLB_FPS));*/
+     SetTextColor(hDC, RGB(2, 5, 55));
+     TextOut(hDC, 8, 8, Buf, sprintf(Buf, "Frames Per Sec: %.2f", GLB_FPS));
 
 
 } /* End of Draw function */ 
