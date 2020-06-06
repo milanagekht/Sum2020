@@ -158,7 +158,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     SelectObject(hMemDC, hBm);
 
     /* Redraw frame */
-    GlobeSet(w / 2, h / 2, (w < h ? w : h) * 0.4);
+    GlobeSet(w / 2, h / 2, 2.0);
     SendMessage(hWnd, WM_TIMER, 0, 0);
     return 0;
   case WM_KEYDOWN:

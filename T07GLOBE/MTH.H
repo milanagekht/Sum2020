@@ -407,7 +407,7 @@ __inline MATR MatrView(VEC Loc, VEC At, VEC Up1)
   VEC
       Dir = VecNormalize(VecSubVec(At, Loc)),
       Right = VecNormalize(VecCrossVec(Dir, Up1)),
-      Up = VecCrossVec(Right, Dir);
+      Up = VecNormalize(VecCrossVec(Right, Dir));
   MATR m =
   {
     {
@@ -419,6 +419,38 @@ __inline MATR MatrView(VEC Loc, VEC At, VEC Up1)
   };
   return m;
 }
+
+__inline MATR MatrOrtho(DBL l, DBL r, DBL b, DBL t, DBL n, DBL f)
+{
+  MATR m =
+  {
+    {
+      {2 / (r - l), 0, 0, 0},
+      {0, 2 / (t - b), 0, 0},
+      {0, 0, ( - 2 ) / (f - n), 0},
+      {( - (r + l) )/ (r - l),( - (t + b) )/ (t - b), ( - (f + n) )/ (f - n),  1}
+     }
+  };
+
+  return m;
+}
+
+__inline MATR MatrFrustum(DBL l, DBL r, DBL b, DBL t, DBL n, DBL f)
+{
+  MATR m =
+  {
+    {
+      {2 * n / (r - l), 0, 0, 0},
+      {0, 2 * n / (t - b), 0, 0},
+      {(r + l) / (r - l), (t + b) / (t - b), -(f + n) / (f - n), -1},
+      {0, 0, -2 * n * f / (f - n),  0}
+     }
+  };
+
+  return m;
+}
+
+
 
 
 
