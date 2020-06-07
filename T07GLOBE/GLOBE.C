@@ -96,7 +96,7 @@ VOID DrawGlobe( HDC hDC )
     Hp = Size * Hs / Ws, Wp = Size;
 
   m = MatrMulMatr3(MatrRotateY(GLB_Time * 8), 
-                   MatrView(VecSet(sin(GLB_Time * 2.26) * 3, sin(GLB_Time * 2) * 5,5), VecSet(0, 0, 0), VecSet(0, 1, 0)),
+                   MatrView(VecSet(sin(GLB_Time * 2.26) * 2, sin(GLB_Time * 2) * 7,5), VecSet(0, 0, 0), VecSet(0, 1, 0)),
                    MatrFrustum(-Wp / 2, Wp / 2 , -Hp / 2, Hp / 2, Size, 400));
   /*m = MatrView(VecSet(GLB_Time * 0.26, GLB_Time * 2,5), 
                VecSet(0, 2, 0), 
@@ -165,8 +165,9 @@ VOID DrawGlobe( HDC hDC )
           p[3] = pnts[i + 1][j];
 
           /*SetDCBrushColor(hDC, RGB(0, 0, 0));*/ 
-          /*(SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256)); */
-          SetDCBrushColor(hDC, RGB( (i * 46 / N), (i * 147 / N), (i * 152 / N)));
+          /*SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256));*/ 
+          /*SetDCBrushColor(hDC, RGB( (i * 46 / N), (i * 147 / N), (i * 152 / N)));*/
+          SetDCBrushColor(hDC, RGB( 30 +(30 + 203) / (N - i), 98 + (98 - 68) / (N - i),  233 + (233 - 47) / (N - i)));
           /*SetDCBrushColor(hDC, RGB( (255 / (i +1)), (255 / (i +1)), (255 / (i +1))));*/
           sign =
             (p[0].x - p[1].x) * (p[0].y + p[1].y) +
@@ -174,7 +175,7 @@ VOID DrawGlobe( HDC hDC )
             (p[2].x - p[3].x) * (p[2].y + p[3].y) +
             (p[3].x - p[0].x) * (p[3].y + p[0].y);
           if (k == 0 && sign <= 0 || k == 1 && sign > 0)
-          Polygon(hDC, p, 4);
+            Polygon(hDC, p, 4);
          }
 
     SetTextColor(hDC, RGB(2, 5, 55));
