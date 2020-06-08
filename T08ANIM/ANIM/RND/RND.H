@@ -29,6 +29,15 @@ extern MATR
   MG5_RndMatrProj, /* Projection coordinate system matrix */
   MG5_RndMatrVP;   /* Stored (View * Proj) matrix */
 
+DOUBLE MG5_GLB_Time;
+DOUBLE MG5_GLB_DeltaTime;
+DOUBLE MG5_GLB_FPS;
+BOOL MG5_GLB_IsPause;
+LONG MG5_StartTime, MG5_PauseTime;
+LONG MG5_OldTime;
+LONG MG5_OldFPSTime;
+LONG MG5_FrameCount;
+
 
 /* Vertex type */
 typedef struct tagmg5VERTEX
@@ -159,6 +168,18 @@ VOID MG5_RndPrimDraw( mg5PRIM *Pr, MATR World );
  *   (BOOL) result.
  */
 /*VOID MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName );*/
+
+
+/* Load primitive from .OBJ file function.
+ * ARGUMENTS:
+ *   - pointer to primitive to be build:
+ *       mg5PRIM *Pr;
+ *   - .OBJ file name:
+ *       CHAR *FileName;
+ * RETURNS:
+ *   (BOOL) TRUE is successful, FALSE otherwise.
+ */
+BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName );
 
 
 /* Create primitive of sphere function 

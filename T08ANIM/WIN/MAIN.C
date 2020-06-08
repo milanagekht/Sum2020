@@ -62,7 +62,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
   PAINTSTRUCT ps;
-  static mg5PRIM Pr, Pv, Pr1;
+  static mg5PRIM Pr, Pv, Pr1, L, O;
 
   switch (Msg)
   {
@@ -74,7 +74,10 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     MG5_RndInit(hWnd);
     MG5_RndPrimCreateTorus(&Pr, VecSet(0, 0, 0), 8, 30, 47);
     MG5_RndPrimCreateTorus(&Pr1, VecSet(0, 0, 0), 8, 30, 47);
-    /*MG5_RndPrimCreateSphere(&Pv, VecSet(0, 0, 0), 3, 6, 20);*/
+    MG5_RndPrimCreateSphere(&Pv, VecSet(0, 0, 0), 4, 20, 30);
+
+    MG5_RndPrimLoad(&L, "Mickey Mouse.obj");
+    /*MG5_RndPrimLoad(&O, "Studio Pose OLAF.obj");*/
     SetTimer(hWnd, 30, 2, NULL);
     return 0;
   case WM_CLOSE:
@@ -93,7 +96,9 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     MG5_RndStart();
     MG5_RndPrimDraw(&Pr, MatrRotateX( clock() /-20.0));
     MG5_RndPrimDraw(&Pr1, MatrRotateY( clock() /20.0));
-    /*MG5_RndPrimDraw(&Pv, MatrRotateX( clock() / 20.0)); */
+    MG5_RndPrimDraw(&Pv, MatrRotateX( clock() / 20.0));
+    MG5_RndPrimDraw(&L, MatrMulMatr(MatrScale( VecSet(0.01, 0.01, 0.01)),MatrRotateY( clock() / -20.0)));
+    /*MG5_RndPrimDraw(&O, MatrMulMatr(MatrScale( VecSet(0.03, 0.03, 0.03)),MatrRotateX( clock() /20.0)));*/
     MG5_RndEnd();
     hDC = GetDC(hWnd);
     MG5_RndCopyFrame(hDC);
@@ -109,7 +114,9 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   case WM_DESTROY:
     MG5_RndPrimFree(&Pr);
     MG5_RndPrimFree(&Pr1);
-    /*MG5_RndPrimFree(&Pv);*/
+    MG5_RndPrimFree(&Pv);
+    MG5_RndPrimFree(&L);
+    /*MG5_RndPrimFree(&O);*/
     MG5_RndClose();
     KillTimer(hWnd, 30);
     PostQuitMessage(30);

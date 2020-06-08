@@ -6,6 +6,8 @@
  */
 
 #include <string.h>
+#include <stdio.h>
+#include <windows.h>
 
 #include "rnd.h"
 
@@ -93,6 +95,69 @@ VOID MG5_RndPrimDraw( mg5PRIM *Pr, MATR World )
   free(pnts);
 } /* End of 'MG5_RndPrimDraw' function */
 
+/* Load primitive from .OBJ file function.
+ * ARGUMENTS:
+ *   - pointer to primitive to be build:
+ *       mg5PRIM *Pr;
+ *   - .OBJ file name:
+ *       CHAR *FileName;
+ * RETURNS:
+ *   (BOOL) TRUE is successful, FALSE otherwise.
+ */
+BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName )
+{
+  FILE *F;
+  INT nv = 0, nf = 0;
+  static CHAR Buf[1000];
+
+  memset(Pr, 0, sizeof(mg5PRIM));
+
+  if ((F = fopen(FileName, "r")) == NULL)
+    return FALSE;
+
+  /* Vertex and factes count */
+  while (fgets(Buf, sizeof(Buf) - 1, F) != NULL)
+    if (Buf[0] == 'v' && Buf[1] == ' ')
+      nv++;
+    else if (Buf[0] == 'f' && Buf[1] == ' ')
+      nf++;
+
+  if (!MG5_RndPrimCreate(Pr, nv, nf * 3))
+  {
+    fclose(F);
+    return FALSE;
+  }
+
+  /* Load geometry data */
+  rewind(F);
+  nv = 0;
+  nf = 0;
+  while (fgets(Buf, sizeof(Buf) - 1, F) != NULL)
+    if (Buf[0] == 'v' && Buf[1] == ' ')
+    {
+      DBL x, y, z;
+
+      sscanf(Buf + 2, "%lf %lf %lf", &x, &y, &z);
+      Pr->V[nv++].P = VecSet(x, y, z);
+    }
+    else if (Buf[0] == 'f' && Buf[1] == ' ')
+    {
+      INT n1, n2, n3;
+
+      sscanf(Buf + 2, "%d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &n1, &n2, &n3) == 3 ||
+        sscanf(Buf + 2, "%d//%*d %d//%*d %d//%*d", &n1, &n2, &n3) == 3 ||
+        sscanf(Buf + 2, "%d/%*d %d/%*d %d/%*d", &n1, &n2, &n3) == 3 ||
+        sscanf(Buf + 2, "%d %d %d", &n1, &n2, &n3) == 3;
+      Pr->I[nf++] = n1 - 1;
+      Pr->I[nf++] = n2 - 1;
+      Pr->I[nf++] = n3 - 1;
+    }
+
+
+  fclose(F);
+  return TRUE;
+} /* End of 'MG5_RndPrimCreateCone' function */
+
 
 /* Create primitive of sphere function 
  * ARGUMENTS:
@@ -159,8 +224,8 @@ BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH )
   DBL theta, phi;
   INT i, j, m, n, r = 3;
 
-  /* Create sphere premitive */
-  if (!MG5_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * (SplitH - 1) * 4 * 3))
+  /* Create torus premitive */
+  if (!MG5_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * (SplitH - 1) * 2 * 3))
     return FALSE;
 
   /* Build vertex array */
