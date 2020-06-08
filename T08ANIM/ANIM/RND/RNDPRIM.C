@@ -71,7 +71,7 @@ VOID MG5_RndPrimDraw( mg5PRIM *Pr, MATR World )
   if ((pnts = malloc(sizeof(POINT) * Pr->NumOfV)) == NULL)
     return;
 
-  /* Build projection */
+  /* Projection building*/
   for (i = 0; i < Pr->NumOfV; i++)
   {
     VEC p = VecMulMatr(Pr->V[i].P, wvp);
@@ -82,7 +82,7 @@ VOID MG5_RndPrimDraw( mg5PRIM *Pr, MATR World )
   SelectObject(MG5_hRndDCFrame, GetStockObject(DC_PEN));
   SetDCPenColor(MG5_hRndDCFrame, RGB(47, 168, 188));
 
-  /* Draw triangles */
+  /* Triangles */
   for (i = 0; i < Pr->NumOfI; i += 3)
   {
     MoveToEx(MG5_hRndDCFrame, pnts[Pr->I[i]].x, pnts[Pr->I[i]].y, NULL);
@@ -113,7 +113,7 @@ BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
   INT i, j, m, n;
 
   /* Create sphere premitive */
-  if (!MG5_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * (SplitH - 1) * 2 * 3))
+  if (!MG5_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * (SplitH - 1) * 4 * 6))
     return FALSE;
 
   /* Build vertex array */

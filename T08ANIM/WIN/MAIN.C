@@ -72,7 +72,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_CREATE:
     MG5_RndInit(hWnd);
-    MG5_RndPrimCreateSphere(&Pr, VecSet(1, 1, 1), 8, 30, 47);
+    MG5_RndPrimCreateSphere(&Pr, VecSet(0, 0, 0), 8, 30, 47);
     SetTimer(hWnd, 30, 2, NULL);
     return 0;
   case WM_CLOSE:

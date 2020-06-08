@@ -2,7 +2,7 @@
  * PROGRAMMER: MG5
  * DATE: 06.06.2020
  * PURPOSE: 3D animation project.
- *          Render system render handle function
+ *          Handle function for render system
  */
 
 #include <time.h>
@@ -100,7 +100,6 @@ VOID MG5_RndStart( VOID )
 
 /* End draw function 
  * ARGUMENTS: None.
- *
  * RETURNS: None.
  */
 VOID MG5_RndEnd( VOID )

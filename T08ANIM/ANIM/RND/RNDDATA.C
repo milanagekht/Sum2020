@@ -2,7 +2,7 @@
  * PROGRAMMER: MG5
  * DATE: 06.06.2020
  * PURPOSE: 3D animation project.
- *          Render system global data
+ *          Global data for render
  */
 
 #include "rnd.h"
