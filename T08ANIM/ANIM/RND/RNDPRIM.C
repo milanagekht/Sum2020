@@ -113,7 +113,7 @@ BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
   INT i, j, m, n;
 
   /* Create sphere premitive */
-  if (!MG5_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * (SplitH - 1) * 4 * 6))
+  if (!MG5_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * (SplitH - 1) * 2 * 3))
     return FALSE;
 
   /* Build vertex array */
@@ -140,6 +140,53 @@ BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
 
   return TRUE;
 } /* End of 'MG5_RndPrimCreateSphere' function */
+
+/* Create primitive of torus function 
+ * ARGUMENTS:
+ *   - prim struct:
+ *       mg5PRIM *Pr.
+ *   - centre coordinate:
+ *       VEC C.
+ *   - radius
+ *       DBL R.
+ *   - number of segments.
+ *       INT SplitW, INT SplitH
+ * RETURNS:
+ *   (BOOL) result.
+ */
+BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH )
+{
+  DBL theta, phi;
+  INT i, j, m, n, r = 3;
+
+  /* Create sphere premitive */
+  if (!MG5_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * (SplitH - 1) * 4 * 3))
+    return FALSE;
+
+  /* Build vertex array */
+  for (theta = 0, i = 0, m = 0; i < SplitH; i++, theta +=  2 * PI / (SplitH - 1))
+    for (phi = 0, j = 0; j < SplitW; j++, phi += 2 * PI / (SplitW - 1))
+      Pr->V[m++].P = VecSet( C.X + (R + r * cos(phi)) * cos(theta),
+                             C.Y + (R + r * cos(phi)) * sin (theta),
+                             C.Z +r * sin(phi));
+
+  /* Build index array */
+  for (i = 0, m = 0, n = 0; i < SplitH - 1; i++, m++)
+    for (j = 0; j < SplitW - 1; j++, m++)
+    {
+      /* first triangle */
+      Pr->I[n++] = m;
+      Pr->I[n++] = m + 1;
+      Pr->I[n++] = m + SplitW;
+
+      /* second triangle */
+      Pr->I[n++] = m + SplitW;
+      Pr->I[n++] = m + 1;
+      Pr->I[n++] = m + SplitW + 1;
+    }
+
+  return TRUE;
+} /* End of 'MG5_RndPrimCreateTorus' function */
 
 
 

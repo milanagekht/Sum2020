@@ -176,6 +176,21 @@ VOID MG5_RndPrimDraw( mg5PRIM *Pr, MATR World );
  */
 BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH );
 
+/* Create primitive of torus function 
+ * ARGUMENTS:
+ *   - prim struct:
+ *       mg5PRIM *Pr.
+ *   - centre coordinate:
+ *       VEC C.
+ *   - radius
+ *       DBL R.
+ *   - number of segments.
+ *       INT SplitW, INT SplitH
+ * RETURNS:
+ *   (BOOL) result.
+ */
+BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH );
+
 #endif /* __DEF_H_ */
 
 /* END OF 'RND.H' FILE */
