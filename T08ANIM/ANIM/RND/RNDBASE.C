@@ -37,10 +37,6 @@ VOID MG5_RndInit( HWND hWnd )
   MG5_RndProjSet();
   MG5_RndCamSet(VecSet(12, 8, 20)/*VecSet(sin(clock() * 2.26)* 2, sin(clock() * 2) * 7,5)*/, VecSet(0, 0, 0), VecSet(0, 1, 0));
 
-  MG5_StartTime = MG5_OldTime = MG5_OldFPSTime = clock();
-  MG5_FrameCount = 0;
-  MG5_PauseTime = 0;
-  MG5_GLB_IsPause = FALSE;
 } /* End of 'MG5_RndInit' function */
 
 
@@ -96,28 +92,6 @@ VOID MG5_RndCopyFrame( HDC hDC )
  */
 VOID MG5_RndStart( VOID )
 {
-    LONG t = clock();
-
-     if (!MG5_GLB_IsPause)
-  {
-    MG5_GLB_Time = (DBL)(t - MG5_PauseTime - MG5_StartTime) / CLOCKS_PER_SEC;
-    MG5_GLB_DeltaTime = (DBL)(t - MG5_OldTime) / CLOCKS_PER_SEC;
-  }
-  else
-  {
-    MG5_PauseTime += t - MG5_OldTime;
-    MG5_GLB_DeltaTime = 0;
-  }
-
-  MG5_FrameCount++;
-  if (t - MG5_OldFPSTime > CLOCKS_PER_SEC)
-  {
-    MG5_GLB_FPS = MG5_FrameCount / ((DBL)(t - MG5_OldFPSTime) / CLOCKS_PER_SEC);
-    MG5_OldFPSTime = t;
-    MG5_FrameCount = 0;
-  }
-  MG5_OldTime = t;
-
   SelectObject(MG5_hRndDCFrame, GetStockObject(NULL_PEN));
   /*SelectObject(MG5_hRndDCFrame, GetStockObject(WHITE_BRUSH));*/
   SelectObject(MG5_hRndDCFrame, GetStockObject(DC_BRUSH));
@@ -133,10 +107,6 @@ VOID MG5_RndStart( VOID )
  */
 VOID MG5_RndEnd( VOID )
 {
-  CHAR Buf[102];
-
-  SetTextColor(MG5_hRndDCFrame, RGB(2, 5, 55));
-    TextOut(MG5_hRndDCFrame, 8, 8, Buf, sprintf(Buf, "Frames Per Sec: %.2f", MG5_GLB_FPS));
 } /* End of 'MG5_RndEnd' function */
 
 

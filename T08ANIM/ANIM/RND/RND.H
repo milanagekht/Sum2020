@@ -29,15 +29,6 @@ extern MATR
   MG5_RndMatrProj, /* Projection coordinate system matrix */
   MG5_RndMatrVP;   /* Stored (View * Proj) matrix */
 
-DOUBLE MG5_GLB_Time;
-DOUBLE MG5_GLB_DeltaTime;
-DOUBLE MG5_GLB_FPS;
-BOOL MG5_GLB_IsPause;
-LONG MG5_StartTime, MG5_PauseTime;
-LONG MG5_OldTime;
-LONG MG5_OldFPSTime;
-LONG MG5_FrameCount;
-
 
 /* Vertex type */
 typedef struct tagmg5VERTEX

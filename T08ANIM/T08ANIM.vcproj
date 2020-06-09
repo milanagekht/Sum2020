@@ -193,6 +193,26 @@
 			<Filter
 				Name="Animation System"
 				>
+				<File
+					RelativePath=".\ANIM\ANIM.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\ANIM.H"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\INPUT.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\TIMER.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\UNIT.C"
+					>
+				</File>
 				<Filter
 					Name="Rendering System"
 					>
@@ -219,6 +239,26 @@
 				>
 				<File
 					RelativePath=".\WIN\MAIN.C"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Units"
+				>
+				<File
+					RelativePath=".\U_BBALL.C"
+					>
+				</File>
+				<File
+					RelativePath=".\U_COW.C"
+					>
+				</File>
+				<File
+					RelativePath=".\U_CTRL.C"
+					>
+				</File>
+				<File
+					RelativePath=".\UNIT.H"
 					>
 				</File>
 			</Filter>

@@ -6,10 +6,11 @@
  */
 #include <time.h>
 
-#include "../def.h"
-#include "../anim/rnd/rnd.h"
+#include "../unit.h"
 
 #include <windows.h>
+
+INT MG5_MouseWheel;
 
 
 /* Window class name */
@@ -23,6 +24,8 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   HWND hWnd;
   MSG msg;
   WNDCLASS wc;
+
+  SetDbgMemHooks();
 
   /* Fill window class structure */
   wc.style = 0;
@@ -47,6 +50,10 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   hWnd = CreateWindow(WND_CLASS_NAME, WND_CLASS_NAME, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
       NULL, NULL, hInstance, NULL);
+
+  /*MG5_AnimUnitAdd(MG5_UnitCreateBall());*/
+  MG5_AnimUnitAdd(MG5_UnitCreateCow());
+  MG5_AnimUnitAdd(MG5_UnitCreateControl());
   
   ShowWindow(hWnd, CmdShow);
   /* Message loop */
@@ -62,7 +69,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
   PAINTSTRUCT ps;
-  static mg5PRIM Pr, Pv, Pr1, L, O;
+  /*static mg5PRIM Pr, Pv, Pr1, L, O;*/
 
   switch (Msg)
   {
@@ -71,13 +78,15 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
       GetSystemMetrics(SM_CYMAXTRACK) + GetSystemMetrics(SM_CYCAPTION) + 2 * GetSystemMetrics(SM_CYBORDER);
     return 0;
   case WM_CREATE:
-    MG5_RndInit(hWnd);
-    MG5_RndPrimCreateTorus(&Pr, VecSet(0, 0, 0), 8, 30, 47);
+    /*MG5_RndInit(hWnd);*/
+    /*MG5_RndPrimCreateTorus(&Pr, VecSet(0, 0, 0), 8, 30, 47);
     MG5_RndPrimCreateTorus(&Pr1, VecSet(0, 0, 0), 8, 30, 47);
-    MG5_RndPrimCreateSphere(&Pv, VecSet(0, 0, 0), 4, 20, 30);
+    MG5_RndPrimCreateSphere(&Pv, VecSet(0, 0, 0), 4, 20, 30);*/
 
-    MG5_RndPrimLoad(&L, "Mickey Mouse.obj");
+    /*MG5_RndPrimLoad(&L, "Mickey Mouse.obj");*/
+    /*MG5_RndPrimLoad(&L, "cow.obj");*/
     /*MG5_RndPrimLoad(&O, "Studio Pose OLAF.obj");*/
+    MG5_AnimInit(hWnd);
     SetTimer(hWnd, 30, 2, NULL);
     return 0;
   case WM_CLOSE:
@@ -88,20 +97,32 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     if (wParam == VK_ESCAPE)
       SendMessage(hWnd, WM_CLOSE, 0, 0);
     return 0;
+    case WM_LBUTTONDOWN:
+    SetCapture(hWnd);
+    return 0;
+  case WM_LBUTTONUP:
+    ReleaseCapture();
+    return 0;
+  case WM_MOUSEWHEEL:
+    MG5_MouseWheel += (SHORT)HIWORD(wParam);
+    return 0;
   case WM_SIZE:
-    MG5_RndResize(LOWORD(lParam), HIWORD(lParam));
+    MG5_AnimResize(LOWORD(lParam), HIWORD(lParam));
+    /*MG5_RndResize(LOWORD(lParam), HIWORD(lParam));*/
     SendMessage(hWnd, WM_TIMER, 0, 0);
     return 0;
   case WM_TIMER:
-    MG5_RndStart();
+    /*MG5_RndStart();
     MG5_RndPrimDraw(&Pr, MatrRotateX( clock() /-20.0));
     MG5_RndPrimDraw(&Pr1, MatrRotateY( clock() /20.0));
     MG5_RndPrimDraw(&Pv, MatrRotateX( clock() / 20.0));
-    MG5_RndPrimDraw(&L, MatrMulMatr(MatrScale( VecSet(0.01, 0.01, 0.01)),MatrRotateY( clock() / -20.0)));
+    MG5_RndPrimDraw(&L, MatrMulMatr(MatrScale( VecSet(0.01, 0.01, 0.01)),MatrRotateY( clock() / -20.0)));*/
+    /*MG5_RndPrimDraw(&L, MatrMulMatr(MatrScale( VecSet(0.5, 0.5, 0.5)),MatrRotateY( clock() / -20.0)));*/
     /*MG5_RndPrimDraw(&O, MatrMulMatr(MatrScale( VecSet(0.03, 0.03, 0.03)),MatrRotateX( clock() /20.0)));*/
-    MG5_RndEnd();
-    hDC = GetDC(hWnd);
-    MG5_RndCopyFrame(hDC);
+    /*MG5_RndEnd();*/
+    /*hDC = GetDC(hWnd);
+    MG5_RndCopyFrame(hDC);*/
+    MG5_AnimRender();
 
     /* Send repaint message */
     InvalidateRect(hWnd, NULL, FALSE);
@@ -112,12 +133,13 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     EndPaint(hWnd, &ps);
     return 0;
   case WM_DESTROY:
-    MG5_RndPrimFree(&Pr);
+    /*MG5_RndPrimFree(&Pr);
     MG5_RndPrimFree(&Pr1);
     MG5_RndPrimFree(&Pv);
-    MG5_RndPrimFree(&L);
+    MG5_RndPrimFree(&L);*/
     /*MG5_RndPrimFree(&O);*/
-    MG5_RndClose();
+    /*MG5_RndClose(); */
+    MG5_AnimClose();
     KillTimer(hWnd, 30);
     PostQuitMessage(30);
     return 0;
