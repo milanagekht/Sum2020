@@ -16,12 +16,13 @@
 
 /* Data */
 
-extern HWND MG5_hRndWnd;        /* Work window handle */
-/*extern HDC MG5_hRndDCFrame;*/     /* Work window memory device context  */ 
-extern HDC MG5_hRndDC;     /* Work window memory device context  */
-/*extern HBITMAP MG5_hRndBmFrame;*/ /* Work window background bitmap handle */
- extern HGLRC MG5_hRndGLRC;
+extern HWND MG5_hRndWnd;                 /* Work window handle */
+/*extern HDC MG5_hRndDCFrame;*/          /* Work window memory device context  */ 
+extern HDC MG5_hRndDC;                   /* Work window memory device context  */
+/*extern HBITMAP MG5_hRndBmFrame;*/      /* Work window background bitmap handle */
+extern HGLRC MG5_hRndGLRC;
 extern INT MG5_RndFrameH, MG5_RndFrameW; /* Work window size */
+extern INT MG5_RndProgId;                /* Global shader for checking */ 
 
 
 extern DBL
@@ -39,17 +40,21 @@ extern MATR
 /* Vertex type */
 typedef struct tagmg5VERTEX
 {
-  VEC P;  /* Vertex position */
+  VEC P;
+  VEC2 T; 
+  VEC N;
+  VEC4 C;
 } mg5VERTEX;
 
 
 /* Primitive type */
 typedef struct tagmg5PRIM
 {
-  mg5VERTEX *V; /* Vertex attributes array */
-  INT NumOfV;   /* Number of vertices */
-  INT *I;       /* Index array */
-  INT NumOfI;   /* Number of indices */
+  INT
+    VA,
+    VBuf, 
+    IBuf;
+  INT NumOfElements;   /* Number of vertices */
   MATR Trans;   /* Transformation matrix */
 } mg5PRIM;
 
@@ -131,7 +136,7 @@ VOID MG5_RndCamSet( VEC Loc, VEC At, VEC Up );
  * RETURNS:
  *   (BOOL) result.
  */
-BOOL MG5_RndPrimCreate( mg5PRIM *Pr, INT NoofV, INT NoofI );
+VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NumOfV, INT *I, INT NumOfI );
 
 
 /* Delete primitive function.
@@ -208,6 +213,23 @@ BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
  *   (BOOL) result.
  */
 BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH );
+
+/* Load shader program from .GLSL files function.
+ * ARGUMENTS:
+ *   - shader file path to load (path\***.glsl):
+ *       CHAR *ShaderFileNamePrefix;
+ * RETURNS:
+ *   (INT) load shader program Id.
+ */
+INT MG5_RndShdLoad( CHAR *ShaderFileNamePrefix );
+
+/* Unload shader program from memory files function.
+ * ARGUMENTS:
+ *   - shader program Id:
+ *       INT ProgId;
+ * RETURNS: None.
+ */
+VOID MG5_RndShdDelete( INT ProgId );
 
 #endif /* __DEF_H_ */
 

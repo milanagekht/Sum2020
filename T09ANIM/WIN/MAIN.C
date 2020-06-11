@@ -48,7 +48,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
 
   for (i = 0; i < 30; i++)
      MG5_AnimUnitAdd(MG5_UnitCreateBall());
-  MG5_AnimUnitAdd(MG5_UnitCreateCow()); 
+  /*MG5_AnimUnitAdd(MG5_UnitCreateCow());*/ 
   MG5_AnimUnitAdd(MG5_UnitCreateControl());
   
   ShowWindow(hWnd, CmdShow);

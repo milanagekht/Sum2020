@@ -53,7 +53,7 @@ static VOID MG5_UnitClose( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
 /* Unit inter frame events handle function */
 static VOID MG5_UnitResponse( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
 {
-  VEC V = VecSet(0, 0, Uni->Distance);
+  VEC N = VecSet(0, 0, Uni->Distance);
 
   /*if (Ani->KeysClick['P'])
     
@@ -68,12 +68,13 @@ static VOID MG5_UnitResponse( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
     Uni->RotateAngle += Ani->DeltaTime * 30 * Ani->Mdx;
     Uni->ElevatorAngle += Ani->DeltaTime * 30 * Ani->Mdy;
   }
-  V = PointTransform(V,
+  N = PointTransform(N,
     MatrMulMatr3(MatrRotateZ(-Uni->Distance),
                  MatrRotateX(-Uni->ElevatorAngle),
                  MatrRotateY(-Uni->RotateAngle))); 
-  MG5_RndCamSet(/*PointTransform(VecSet(50, 50, 50), MatrRotateY(20. *Ani->Time))*/V, VecSet(0, 1, 0), VecSet(0, 1, 0));
+  MG5_RndCamSet(N, VecSet(0, 1, 0), VecSet(0, 1, 0));
 
+  //MG5_RndCamSet(VecSet(0, 0, 10), VecSet(0, 0, 0), VecSet(0, 1, 0));
 } /* End of 'MG5_UnitResponse' function */
 
 

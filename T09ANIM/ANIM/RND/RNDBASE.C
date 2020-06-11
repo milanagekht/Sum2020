@@ -6,6 +6,7 @@
  */
 
 #include "rnd.h"
+#include <time.h>
 
 /* Link libraryes */
 #pragma comment(lib, "opengl32")
@@ -22,6 +23,7 @@ VOID MG5_RndInit( HWND hWnd )
   INT i;
   /*HDC hDC;*/
   PIXELFORMATDESCRIPTOR pfd = {0};
+  CHAR *Str;
 
   MG5_hRndWnd = hWnd;
 
@@ -59,6 +61,10 @@ VOID MG5_RndInit( HWND hWnd )
     exit(0);
   }
 
+  Str = glGetString(GL_RENDERER);
+  Str = glGetString(GL_VENDOR);
+  Str = glGetString(GL_VERSION);
+
   /* Set default render parameters */
   glClearColor(0.30, 0.50, 0.8, 1);
   glEnable(GL_DEPTH_TEST);
@@ -67,7 +73,7 @@ VOID MG5_RndInit( HWND hWnd )
   MG5_RndProjFarClip = 300;
 
   MG5_RndProjSet();
-  MG5_RndCamSet(VecSet(12, 8, 20)/*VecSet(sin(clock() * 2.26)* 2, sin(clock() * 2) * 7,5)*/, VecSet(0, 0, 0), VecSet(0, 1, 0));
+  MG5_RndCamSet(VecSet(12, 8, 20), VecSet(0, 0, 0), VecSet(0, 1, 0));
 
 } /* End of 'MG5_RndInit' function */
 
@@ -80,8 +86,8 @@ VOID MG5_RndClose( VOID )
 {
   wglMakeCurrent(NULL, NULL);
   wglDeleteContext(MG5_hRndGLRC);
-  /*if (MG5_hRndBmFrame != NULL)
-    DeleteObject(MG5_hRndBmFrame);*/
+
+  /* Delete resources */
   ReleaseDC(MG5_hRndWnd,MG5_hRndDC);
 } /* End of 'MG5_RndClose' function */
 
@@ -94,7 +100,7 @@ VOID MG5_RndClose( VOID )
  */
 VOID MG5_RndResize( INT W, INT H )
 {
- glViewport(0, 0, W, H);
+  glViewport(0, 0, W, H);
 
   MG5_RndFrameW = W;
   MG5_RndFrameH = H;
@@ -111,7 +117,6 @@ VOID MG5_RndResize( INT W, INT H )
 VOID MG5_RndCopyFrame( VOID )
 {
    wglSwapLayerBuffers(MG5_hRndDC, WGL_SWAP_MAIN_PLANE);
-  /*BitBlt(hDC, 0, 0, MG5_RndFrameW, MG5_RndFrameH, MG5_hRndDCFrame, 0, 0, SRCCOPY);*/
 } /* End of 'MG5_RndCopyFrame' function */
 
 
@@ -121,13 +126,17 @@ VOID MG5_RndCopyFrame( VOID )
  */
 VOID MG5_RndStart( VOID )
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  SelectObject(MG5_hRndDC, GetStockObject(NULL_PEN));
-  /*SelectObject(MG5_hRndDCFrame, GetStockObject(WHITE_BRUSH));*/
-  SelectObject(MG5_hRndDC, GetStockObject(DC_BRUSH));
-  SetDCBrushColor(MG5_hRndDC, RGB(0, 0, 0));
-  /*Rectangle(MG5_hRndDC, 0, 0, MG5_RndFrameW + 1, MG5_RndFrameH + 1);*/
+  INT t;
+  static INT reload_time;
 
+  /* Reload shader */
+  if ((t = clock() - reload_time )> CLOCKS_PER_SEC)
+  {
+    MG5_RndShdDelete(MG5_RndProgId);
+    MG5_RndProgId = MG5_RndShdLoad("DEFAULT");
+  }
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 } /* End of 'MG5_RndStart' function */
 
 

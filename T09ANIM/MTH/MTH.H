@@ -34,6 +34,15 @@ typedef struct tagVEC
   FLT X, Y, Z; /* Vector coordinates */
 } VEC;
 
+typedef struct tagVEC2
+{
+  FLT X, Y; /* Vector coordinates */
+} VEC2;
+
+typedef struct tagVEC4
+{
+  FLT X, Y, Z, W; /* Vector coordinates */
+} VEC4;
 /* Matrix representation type */
  typedef struct tagMATR
 {
@@ -54,6 +63,13 @@ __inline DBL Rand1( VOID )
 __inline VEC VecSet(FLT X, FLT Y, FLT Z)
 {
   VEC v = { X, Y, Z };
+
+  return v;
+}
+
+__inline VEC4 Vec4Set(FLT X, FLT Y, FLT Z, FLT W)
+{
+  VEC4 v = { X, Y, Z, W };
 
   return v;
 }

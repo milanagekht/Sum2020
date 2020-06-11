@@ -241,6 +241,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\ANIM\RND\RNDSHD.C"
+						>
+					</File>
+					<File
 						RelativePath=".\wglew.h"
 						>
 					</File>

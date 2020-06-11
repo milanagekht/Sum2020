@@ -8,17 +8,18 @@
 #include "rnd.h"
 
 
-HWND MG5_hRndWnd;        /* Work window handle */
-HDC MG5_hRndDC;     /* Work window memory device context  */
-/*HDC MG5_hRndDCFrame;*/     /* Work window memory device context  */
+HWND MG5_hRndWnd;                /* Work window handle */
+HDC MG5_hRndDC;                  /* Work window memory device context  */
+/*HDC MG5_hRndDCFrame;*/         /* Work window memory device context  */
 /*HBITMAP MG5_hRndBmFrame;*/
 HGLRC MG5_hRndGLRC;
+INT MG5_RndProgId;
 INT MG5_RndFrameH, MG5_RndFrameW; /* Work window size */
 
 
 DBL
-  MG5_RndProjSize,  /* Project plane fit square */
-  MG5_RndProjDist,  /* Distance to project plane from viewer (near) */
+  MG5_RndProjSize,      /* Project plane fit square */
+  MG5_RndProjDist,      /* Distance to project plane from viewer (near) */
   MG5_RndProjFarClip;  /* Distance to project far clip plane (far) */
 
 
