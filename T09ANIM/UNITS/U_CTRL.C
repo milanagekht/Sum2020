@@ -98,6 +98,10 @@ static VOID MG5_UnitRender( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
     Ani->IsPause = !Ani->IsPause;
   if (Ani->KeysClick['F'])
     MG5_AnimFlipFullScreen();
+  if (Ani->KeysClick['W'])
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  else if (Ani->KeysClick['S'])
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 sprintf(Buf, "My Animation. Frames Per Second: %.2f", Ani->FPS);
 SetWindowText(Ani->hWnd, Buf); 

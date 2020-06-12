@@ -46,10 +46,19 @@ typedef struct tagmg5VERTEX
   VEC4 C;
 } mg5VERTEX;
 
+typedef enum tagmg5PRIM_TYPE
+{
+  MG5_RND_PRIM_TRIMESH, /* Array of triangles */
+  MG5_RND_PRIM_TRISTRIP, /* Array of stripped triangles */
+  MG5_RND_PRIM_LINES,
+  MG5_RND_PRIM_POINTS, /* Array of points */
+} mg5PRIM_TYPE;
+
 
 /* Primitive type */
 typedef struct tagmg5PRIM
 {
+  mg5PRIM_TYPE Type;
   INT
     VA,
     VBuf, 
@@ -136,7 +145,7 @@ VOID MG5_RndCamSet( VEC Loc, VEC At, VEC Up );
  * RETURNS:
  *   (BOOL) result.
  */
-VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NumOfV, INT *I, INT NumOfI );
+VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI, mg5PRIM_TYPE Type );
 
 
 /* Delete primitive function.
@@ -230,6 +239,22 @@ INT MG5_RndShdLoad( CHAR *ShaderFileNamePrefix );
  * RETURNS: None.
  */
 VOID MG5_RndShdDelete( INT ProgId );
+
+/* Prim creation from vertex grid function 
+ * ARGUMENTS:
+ *    -pointer to prim:
+ *       mg5PRIM *Pr;
+ *    -pointer to vertex array:
+ *       mg5VERTEX *V;
+ *    -weight and heidht:
+ *       INT W, H;
+ *    - normal evalation flag:
+ *       BOOL IsNormalsNeed;
+ * RETURNS: BOOL;
+ */
+BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL IsNormalsNeed );
+
+
 
 #endif /* __DEF_H_ */
 

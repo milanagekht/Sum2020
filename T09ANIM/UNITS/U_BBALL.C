@@ -17,11 +17,11 @@ typedef struct
  */
 static VOID MG5_UnitInit( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
 {
-  mg5VERTEX V[] = {{{0, 0, 0}}, {{1, 0, 0}}, {{0, 1, 0}}};
+  //mg5VERTEX V[] = {{{0, 0, 0}}, {{1, 0, 0}}, {{0, 1, 0}}};
 
-  MG5_RndPrimCreate(&Uni->Ball, V, 3, NULL, 0);
-  //MG5_RndPrimCreateSphere(&Uni->Ball, VecSet(0, 0, 0), 5, 23, 18);
-  //Uni->Pos = VecMulNum(VecSet(Rand1(), Rand1(), Rand1()), 100);
+  //MG5_RndPrimCreate(&Uni->Ball, V, 3, NULL, 0);
+  MG5_RndPrimCreateSphere(&Uni->Ball, VecSet(0, 0, 0), 5, 23, 18);
+  Uni->Pos = VecMulNum(VecSet(Rand1(), Rand1(), Rand1()), 100);
 } /* End of 'MG5_UnitInit' function */
 
 /* Bounce ball unit inter frame events handle function.

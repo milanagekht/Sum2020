@@ -66,8 +66,11 @@ VOID MG5_RndInit( HWND hWnd )
   Str = glGetString(GL_VERSION);
 
   /* Set default render parameters */
-  glClearColor(0.30, 0.50, 0.8, 1);
+  glClearColor(1.30, 0.50, 0.8, 1);
   glEnable(GL_DEPTH_TEST);
+
+  glEnable(GL_PRIMITIVE_RESTART);
+  glPrimitiveRestartIndex(-1);
 
   MG5_RndProjSize = MG5_RndProjDist = 1.0;
   MG5_RndProjFarClip = 300;
@@ -130,7 +133,7 @@ VOID MG5_RndStart( VOID )
   static INT reload_time;
 
   /* Reload shader */
-  if ((t = clock() - reload_time )> CLOCKS_PER_SEC)
+  if ((t = clock() - reload_time ) > 5 * CLOCKS_PER_SEC)
   {
     MG5_RndShdDelete(MG5_RndProgId);
     MG5_RndProgId = MG5_RndShdLoad("DEFAULT");
