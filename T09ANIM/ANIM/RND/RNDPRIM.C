@@ -23,7 +23,7 @@
  * RETURNS:
  *   (BOOL) result.
  */
-VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI, mg5PRIM_TYPE Type )
+VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5PRIM_TYPE Type, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI )
 {
   memset(Pr, 0, sizeof(mg5PRIM));
   Pr->Type = Type;
@@ -205,7 +205,7 @@ BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
       Ind[n++] = m + SplitW + 1;
       Ind[n++] = m + 1;
     }
-  MG5_RndPrimCreate(Pr, V, noofv, Ind, noofi, MG5_RND_PRIM_TRIMESH);
+  MG5_RndPrimCreate(Pr,MG5_RND_PRIM_TRIMESH, V, noofv, Ind, noofi);
   free(V);
   return TRUE;
 } /* End of 'MG5_RndPrimCreateSphere' func */
@@ -269,7 +269,7 @@ BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH )
       Ind[n++] = m + SplitW + 1;
       Ind[n++] = m + 1;
     }
-  MG5_RndPrimCreate(Pr, V, noofv, Ind, noofi, MG5_RND_PRIM_TRIMESH);
+  MG5_RndPrimCreate(Pr, MG5_RND_PRIM_TRIMESH, V, noofv, Ind, noofi);
   free(V);
   return TRUE;
 } /* End of 'MG5_RndPrimCreateTorus' function */
@@ -361,7 +361,7 @@ BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName )
   }
 
   fclose(F);
-  MG5_RndPrimCreate(Pr, V, nv, Ind, nf, MG5_RND_PRIM_TRIMESH);
+  MG5_RndPrimCreate(Pr, MG5_RND_PRIM_TRIMESH, V, nv, Ind, nf );
   free(V);
   return TRUE;
 } /* End of 'MG5_RndPrimLoad' func */
@@ -378,16 +378,16 @@ BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName )
  *       BOOL IsNormalsNeed;
  * RETURNS: BOOL;
  */
-BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL IsNormalsNeed )
+ BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL NeedNorm )
 {
-  INT *Ind;
   INT i, j, k;
+  INT *Ind;
 
   memset(Pr, 0, sizeof(mg5PRIM));
   if ((Ind = malloc(((2 * W + 1) * (H - 1) - 1) * sizeof(INT))) == NULL)
     return FALSE;
 
-  for (i = 0, k = 0; i < H; i++)
+  for (i = 0, k = 0; i < H - 1; i++)
   {
     for (j = 0; j < W; j++)
     {
@@ -398,7 +398,7 @@ BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL Is
       Ind[k++] = -1;
   }
 
-  if (IsNormalsNeed)
+  if (NeedNorm)
   {
     for (i = 0; i < W * H; i++)
       V[i].N = VecSet(0, 0, 0);
@@ -406,7 +406,8 @@ BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL Is
     for (i = 0; i < H - 1; i++)
       for (j = 0; j < W - 1; j++)
       {
-        mg5VERTEX *P00 = V + i * W + j,
+        mg5VERTEX
+          *P00 = V + i * W + j,
           *P01 = V + i * W + j + 1,
           *P10 = V + (i + 1) * W + j,
           *P11 = V + (i + 1) * W + j + 1;
@@ -423,11 +424,14 @@ BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL Is
         P00->N = VecAddVec(P00->N, N);
         P01->N = VecAddVec(P01->N, N);
         P11->N = VecAddVec(P11->N, N);
-       }
-    for (i = 0; i < W * H; i++)
-       V[i].N = VecNormalize(V[i].N);
+      }
+      for (i = 0; i < W * H; i++)
+        V[i].N = VecNormalize(V[i].N);
   }
-  MG5_RndPrimCreate(Pr, V, W * H, Ind, (2 * W + 1) * (H - 1) - 1,MG5_RND_PRIM_TRISTRIP);
+
+  MG5_RndPrimCreate(Pr, MG5_RND_PRIM_TRISTRIP, V, W * H, Ind,
+    (2 * W + 1) * (H - 1) - 1);
+
   free(Ind);
   return TRUE;
 } /* End of 'MG5_RndPrimCreateFromGrid' */

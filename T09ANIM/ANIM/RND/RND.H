@@ -145,7 +145,7 @@ VOID MG5_RndCamSet( VEC Loc, VEC At, VEC Up );
  * RETURNS:
  *   (BOOL) result.
  */
-VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI, mg5PRIM_TYPE Type );
+VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5PRIM_TYPE Type, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI );
 
 
 /* Delete primitive function.
