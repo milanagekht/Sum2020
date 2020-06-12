@@ -147,10 +147,10 @@ VOID DrawGlobe( HDC hDC )
       for (i = 0; i < N; i++)
         LineTo(hDC, pnts[i][j].x, pnts[i][j].y);
     }*/
-    SelectObject(hDC, GetStockObject(DC_PEN));
+    SelectObject(hDC, GetStockObject(BLACK_PEN));
     SelectObject(hDC, GetStockObject(DC_BRUSH));
     /*SetDCPenColor(hDC, RGB(46, 147, 152));*/
-    SetDCPenColor(hDC, RGB(0, 0, 0));
+    /*SetDCPenColor(hDC, RGB(0, 0, 0));*/
     /*srand(102);*/
     for (k = 0; k < 2; k++)
       for(i = 0; i < N - 1; i++)
@@ -167,8 +167,8 @@ VOID DrawGlobe( HDC hDC )
           /*SetDCBrushColor(hDC, RGB(0, 0, 0));*/ 
           /*SetDCBrushColor(hDC, RGB(rand() % 256, rand() % 256, rand() % 256));*/ 
           /*SetDCBrushColor(hDC, RGB( (i * 46 / N), (i * 147 / N), (i * 152 / N)));*/
-          SetDCBrushColor(hDC, RGB( 30 +(30 + 203) / (N - i), 98 + (98 - 68) / (N - i),  233 + (233 - 47) / (N - i)));
-          /*SetDCBrushColor(hDC, RGB( (255 / (i +1)), (255 / (i +1)), (255 / (i +1))));*/
+          /*SetDCBrushColor(hDC, RGB(30 + 203 / N * (1 + i), 98 - 68 / N * (1 + i), 233 - 47 / N * (1 + i)));*/
+          SetDCBrushColor(hDC, RGB(233 - 11 / N * (1 + i), 30 + 212 / N * (1 + i), 186 - 181 / N * (1 + i)));
           sign =
             (p[0].x - p[1].x) * (p[0].y + p[1].y) +
             (p[1].x - p[2].x) * (p[1].y + p[2].y) +
