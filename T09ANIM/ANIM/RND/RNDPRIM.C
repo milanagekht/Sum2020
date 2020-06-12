@@ -5,26 +5,23 @@
  *          Render system primitive handle function
  */
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+
 
 #include "rnd.h"
 #include "../anim/anim.h"
 
-/* Create prim structure.
+/* Create primitive function.
  * ARGUMENTS:
- *   -Prim structure:
- *       mg5PRIM *Pr;
- *   -vertex array:
- *      mg5VERTEX *V;
- *   - 
- *     mg5PRIM_TYPE Type;
- *   -index array:
- *      INT *I;
- *   -Vertex and index arrays size:
- *      INT NoofV, NoofI;
+ *   - primitive:
+ *       mg5PRIM *Pr.
+ *   - number of vertices:
+ *       INT NoofV.
+ *   - number of indexes:
+ *       INT NoofI.
  * RETURNS:
- *   VOID.
+ *   (BOOL) result.
  */
 VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI, mg5PRIM_TYPE Type )
 {
@@ -36,13 +33,13 @@ VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI,
     glGenBuffers(1, &Pr->VBuf);
     glGenVertexArrays(1, &Pr->VA);
 
-    /* active vertex array */
+    /* Activate vertex array */
     glBindVertexArray(Pr->VA);
 
-    /* active vertex buffer */
+    /* Activate vertex buffer */
     glBindBuffer(GL_ARRAY_BUFFER, Pr->VBuf);
 
-    /* fill data */
+    /* Fill data */
     glBufferData(GL_ARRAY_BUFFER, sizeof(mg5VERTEX) * NoofV, V, GL_STATIC_DRAW);
     
     /* set data order */
@@ -55,23 +52,23 @@ VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI,
     glVertexAttribPointer(3, 4, GL_FLOAT, FALSE, sizeof(mg5VERTEX),
                         (VOID *)(sizeof(VEC) * 2 + sizeof(VEC2)));
   
-    /* enable layouts */
+    /* Enable layouts */
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
 
-    /* disable vertex array */
+    /* Disable vertex array */
     glBindVertexArray(0);
   }
 
   if (I != 0)
   {
     glGenBuffers(1, &Pr->IBuf);
-    /* active index buffer */
+    /* Activate index buffer */
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->IBuf);
 
-    /* fill data */
+    /* Fill data */
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(INT) * NoofI, I, GL_STATIC_DRAW);
     
     Pr->NumOfElements = NoofI;
@@ -79,14 +76,13 @@ VOID MG5_RndPrimCreate( mg5PRIM *Pr, mg5VERTEX *V, INT NoofV, INT *I, INT NoofI,
   else
     Pr->NumOfElements = NoofV;
   Pr->Trans = MatrIdentity();
-} /* end of MG5_RndPrimCreate func */
+} /* End of MG5_RndPrimCreate func */
 
-/* Free Prim structure.
+/* Delete primitive function.
  * ARGUMENTS:
- *   -Prim structure:
- *       mg5PRIM *Pr;
- * RETURNS:
- *   VOID.
+ *   - primitive:
+ *       mg5PRIM *Pr.
+ * RETURNS: None.
  */
 VOID MG5_RndPrimFree( mg5PRIM *Pr )
 {
@@ -101,16 +97,16 @@ VOID MG5_RndPrimFree( mg5PRIM *Pr )
   if (Pr->IBuf != 0)
     glDeleteBuffers(1, &Pr->IBuf);
   memset(Pr, 0, sizeof(mg5PRIM));
-} /* end of MG5_RndPrimFree func */
+} /* End of MG5_RndPrimFree func */
 
-/* Draw prim structure.
-* ARGUMENTS:
- *   -Prim structure:
- *       mg5PRIM *Pr;
- *   -Matrix:
- *       MATR World;
+/* Draw primitive function.
+ * ARGUMENTS:
+ *   - primitive:
+ *       mg5PRIM *Pr.
+ *   - wotld matrix:
+ *       MATR Wolrd.
  * RETURNS:
- *   VOID.
+ *   (BOOL) result.
  */
 VOID MG5_RndPrimDraw( mg5PRIM *Pr, MATR World )
 {
@@ -193,7 +189,7 @@ BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
        V[m].P = (VecSet(C.X + R * x,
                         C.Y + R * y,
                         C.Z + R * z));
-       V[m].C = Vec4Set(0.8, 0.3, 0.47, 1);
+       V[m].C = Vec4Set(0.9, 0.13, 0.47, 1);
        V[m].N = VecSet(x, y, z);
        m++;
     }
@@ -361,7 +357,7 @@ BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName )
   for (i = 0; i < nv; i++)
   { 
     V[i].N = VecNormalize(V[i].N);
-    V[i].C = Vec4Set(0.8, 0.47, 0.26, 1);
+    V[i].C = Vec4Set(0.8, 0.47, 0.28, 1);
   }
 
   fclose(F);
