@@ -1,114 +1,137 @@
- /* FILE NAME  : U_CTRL.C
+/* FILE NAME  : U_CTRL.C
  * PROGRAMMER : MG5
  * LAST UPDATE: 09.06.2020
- * PURPOSE    : Simple 3D animation project.
+ * PURPOSE    : Simple WinAPI animation project.
+ *              Control unit sample.
  */
-
 
 #include <stdio.h>
 
 #include "../units.h"
 
-
+/* Animation unit representation type */
 typedef struct tagmg5UNIT_CTRL
 {
   MG5_UNIT_BASE_FIELDS;
-  /*HDC hDC;*/
   DBL
     Distance,      /* Camera offset */
     RotateAngle,   /* Camera rotate angle */
     ElevatorAngle; /* Camera elevator angle */
+  mg5PRIM Axes;
 } mg5UNIT_CTRL;
 
 
-/* Unit initialization function */
+/* Unit initialization function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       mg5UNIT_CTRL *Uni;
+ *   - animation context:
+ *       mg5ANIM *Ani;
+ * RETURNS: None.
+ */
 static VOID MG5_UnitInit( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
 {
-  /*HFONT hFnt, hFntOld;
+  mg5VERTEX V[] = 
+    {
+      {{0, 0, 0}, {0, 0}, {0, 0, 0}, {1, 0, 0, 1}},
+      {{3000, 0, 0}, {0, 0}, {0, 0, 0}, {1, 0, 0, 1}},
+      {{0, 0, 0}, {0, 0}, {0, 0, 0}, {0, 1, 0, 1}},
+      {{0, 3000, 0}, {0, 0}, {0, 0, 0}, {0, 1, 0, 1}},
+      {{0, 0, 0}, {0, 0}, {0, 0, 0}, {0, 0, 1, 1}},
+      {{0, 0, 3000}, {0, 0}, {0, 0, 0}, {0, 0, 1, 1}}
+    };
+  INT Ind[] = {0, 1, 2, 3, 4, 5};
 
-  hFnt = CreateFont(102, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
-             RUSSIAN_CHARSET,
-             OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
-             FF_DECORATIVE | VARIABLE_PITCH, "Consolas");
-  Uni->CamLoc = VecSet(0, 8, 8); 
-
-  hFntOld = SelectObject(Ani->hDC, hFnt);
-  wglUseFontBitmaps(Ani->hDC, 0, 256, 102);
-  SelectObject(Ani->hDC, hFntOld);
-  DeleteObject(hFnt); */
-
-
+  MG5_RndPrimCreate(&Uni->Axes, MG5_RND_PRIM_LINES, V, 6, Ind, 6);
   Uni->RotateAngle = 8;
   Uni->ElevatorAngle = 30;
   Uni->Distance = 47;
 } /* End of 'MG5_UnitInit' function */
 
 
-/* Unit deinitialization function */
+/* Unit deinitialization function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       mg5UNIT_CTRL *Uni;
+ *   - animation context:
+ *       mg5ANIM *Ani;
+ * RETURNS: None.
+ */
 static VOID MG5_UnitClose( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
 {
 } /* End of 'MG5_UnitClose' function */
 
 
-/* Unit inter frame events handle function */
+/* Unit inter frame events handle function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       mg5UNIT_CTRL *Uni;
+ *   - animation context:
+ *       mg5ANIM *Ani;
+ * RETURNS: None.
+ */
 static VOID MG5_UnitResponse( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
 {
-  VEC N = VecSet(0, 0, Uni->Distance);
+  VEC V = VecSet(0, 0, Uni->Distance);
+  static CHAR Buf[102];
 
-  /*if (Ani->KeysClick['P'])
-    
-  if (Ani->KeysClick['F'])
-    MG5_AnimFlipFullScreen();*/
-  if (Ani->KeysClick[VK_ESCAPE])
-    MG5_AnimDoExit();
-
-  if (Ani->Keys[VK_LBUTTON])
-  {
-    Uni->Distance += Ani->DeltaTime * Ani->Mdz * 0.03;
-    Uni->RotateAngle += Ani->DeltaTime * 30 * Ani->Mdx;
-    Uni->ElevatorAngle += Ani->DeltaTime * 30 * Ani->Mdy;
-  }
-  N = PointTransform(N,
-    MatrMulMatr3(MatrRotateZ(-Uni->Distance),
-                 MatrRotateX(-Uni->ElevatorAngle),
-                 MatrRotateY(-Uni->RotateAngle))); 
-  MG5_RndCamSet(N, VecSet(0, 1, 0), VecSet(0, 1, 0));
-
-  //MG5_RndCamSet(VecSet(0, 0, 10), VecSet(0, 0, 0), VecSet(0, 1, 0));
-} /* End of 'MG5_UnitResponse' function */
-
-
-/* Unit render function */
-static VOID MG5_UnitRender( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
-{
- /* INT n;
-  MATR m = MatrOrtho(0, Ani->W - 1, Ani->H - 1, 0, -1, 1);*/
-  static CHAR Buf[100];
-
-  /*n = sprintf(Buf, "FPS: %.3f", Ani->FPS);
-
-  glDisable(GL_DEPTH_TEST);
-  glLoadMatrixf(m.A[0]);
-  glRasterPos2d(10, 102);
-
-  glListBase(102);
-  glCallLists(n, GL_UNSIGNED_BYTE, Buf);
-  glEnable(GL_DEPTH_TEST);*/
   if (Ani->KeysClick['P'])
     Ani->IsPause = !Ani->IsPause;
   if (Ani->KeysClick['F'])
     MG5_AnimFlipFullScreen();
+  if (Ani->KeysClick[VK_ESCAPE])
+    ;//MG5_AnimDoExit();
   if (Ani->KeysClick['W'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  else if (Ani->KeysClick['S'])
+  if (Ani->KeysClick['S'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-sprintf(Buf, "My Animation. Frames Per Second: %.2f", Ani->FPS);
-SetWindowText(Ani->hWnd, Buf); 
+  Uni->Distance += Ani->GlobalDeltaTime * (2 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
+  Uni->RotateAngle += Ani->GlobalDeltaTime * (-300 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 150 * (Ani->Keys[VK_LEFT] - Ani->Keys[VK_RIGHT]));
+  Uni->ElevatorAngle += Ani->GlobalDeltaTime * (-300 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47 * (Ani->Keys[VK_UP] - Ani->Keys[VK_DOWN]));
+
+
+
+  Uni->Distance += Ani->GlobalDeltaTime * Ani->Mdz * 15;
+  if (Ani->Keys[VK_LBUTTON])
+  {
+    Uni->RotateAngle += Ani->GlobalDeltaTime * 15 * Ani->Mdx;
+    Uni->ElevatorAngle += Ani->GlobalDeltaTime * 15 * Ani->Mdy;
+  }
+  V = PointTransform(V,
+    MatrMulMatr3(MatrRotateZ(-Uni->Distance),
+                 MatrRotateX(-Uni->ElevatorAngle),
+                 MatrRotateY(-Uni->RotateAngle)));
+  MG5_RndCamSet(V, VecSet(0, 1, 0), VecSet(0, 1, 0));
+
+  sprintf(Buf, "My Animation. Frames Per Second: %.3f", Ani->FPS);
+  SetWindowText(Ani->hWnd, Buf);
+} /* End of 'MG5_UnitResponse' function */
+
+
+/* U  nit render function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       mg5UNIT_CTRL *Uni;
+ *   - animation context:
+ *       mg5ANIM *Ani;
+ * RETURNS: None.
+ */
+static VOID MG5_UnitRender( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
+{
+  glLineWidth(18);
+  MG5_RndPrimDraw(&Uni->Axes, MatrIdentity());
+  glLineWidth(1);
 } /* End of 'MG5_UnitRender' function */
 
 
-/* Control unit creation function */
+/* Control unit creation function.
+ * ARGUMENTS:
+ *   - unit structure size in bytes:
+ *       INT Size;
+ * RETURNS:
+ *   (mg5UNIT_CTRL *) pointer to created unit.
+ */
 mg5UNIT * MG5_UnitCreateControl( VOID )
 {
   mg5UNIT_CTRL *Uni;
@@ -123,7 +146,5 @@ mg5UNIT * MG5_UnitCreateControl( VOID )
   Uni->Render = (VOID *)MG5_UnitRender;
   return (mg5UNIT *)Uni;
 } /* End of 'MG5_UnitCreateControl' function */
-
-
 
 /* END OF 'U_CTRL.C' FILE */

@@ -11,6 +11,7 @@
 mg5UNIT * MG5_UnitCreateBall( VOID );
 mg5UNIT * MG5_UnitCreateControl( VOID );
 mg5UNIT * MG5_UnitCreateCow( VOID );
+mg5UNIT * MG5_UnitCreateGrid( VOID );
 
 #endif /* __UNIT_H_ */
 /* End of "UNIT.H" file */

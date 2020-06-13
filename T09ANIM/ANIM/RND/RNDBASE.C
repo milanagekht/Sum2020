@@ -5,8 +5,10 @@
  *          Handle function for render system
  */
 
+#include "../anim.h"
 #include "rnd.h"
 #include <time.h>
+
 
 /* Link libraryes */
 #pragma comment(lib, "opengl32")
@@ -21,21 +23,10 @@
 VOID MG5_RndInit( HWND hWnd )
 {
   INT i;
-  /*HDC hDC;*/
   PIXELFORMATDESCRIPTOR pfd = {0};
-  CHAR *Str;
 
   MG5_hRndWnd = hWnd;
-
-
-  /* Create frame */
   MG5_hRndDC = GetDC(hWnd);
-  /*  hDC = GetDC(hWnd);
-  MG5_hRndDCFrame = CreateCompatibleDC(hDC);
-  ReleaseDC(hWnd, hDC);
-  MG5_hRndBmFrame = NULL;
-  MG5_RndFrameH = 1000;
-  MG5_RndFrameW = 1000;*/
 
   /* OpenGL initialisation */
   pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
@@ -43,7 +34,6 @@ VOID MG5_RndInit( HWND hWnd )
   pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL;
   pfd.cColorBits = 32;
   pfd.cDepthBits = 32;
-
   i = ChoosePixelFormat(MG5_hRndDC, &pfd);
   DescribePixelFormat(MG5_hRndDC, i, sizeof(pfd), &pfd);
   SetPixelFormat(MG5_hRndDC, i, &pfd);
@@ -52,7 +42,6 @@ VOID MG5_RndInit( HWND hWnd )
   MG5_hRndGLRC = wglCreateContext(MG5_hRndDC);
   wglMakeCurrent(MG5_hRndDC, MG5_hRndGLRC);
 
-  /* Initialize GLEW library */
   if (glewInit() != GLEW_OK ||
       !(GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader))
   {
@@ -61,23 +50,23 @@ VOID MG5_RndInit( HWND hWnd )
     exit(0);
   }
 
-  Str = glGetString(GL_RENDERER);
-  Str = glGetString(GL_VENDOR);
-  Str = glGetString(GL_VERSION);
+  MG5_RndProgId = MG5_RndShdLoad("DEFAULT");
 
-  /* Set default render parameters */
   glClearColor(1.30, 0.50, 0.8, 1);
   glEnable(GL_DEPTH_TEST);
 
   glEnable(GL_PRIMITIVE_RESTART);
-  glPrimitiveRestartIndex(-1);
+  //glPrimitiveRestartIndex(-1);
+
+  /* Set default parameters */
+  MG5_RndFrameH = 102;
+  MG5_RndFrameW = 102;
 
   MG5_RndProjSize = MG5_RndProjDist = 1.0;
-  MG5_RndProjFarClip = 300;
+  MG5_RndProjFarClip = 3000;
 
   MG5_RndProjSet();
   MG5_RndCamSet(VecSet(12, 8, 20), VecSet(0, 0, 0), VecSet(0, 1, 0));
-
 } /* End of 'MG5_RndInit' function */
 
 
@@ -89,9 +78,6 @@ VOID MG5_RndClose( VOID )
 {
   wglMakeCurrent(NULL, NULL);
   wglDeleteContext(MG5_hRndGLRC);
-
-  /* Delete resources */
-  ReleaseDC(MG5_hRndWnd,MG5_hRndDC);
 } /* End of 'MG5_RndClose' function */
 
 
@@ -105,8 +91,11 @@ VOID MG5_RndResize( INT W, INT H )
 {
   glViewport(0, 0, W, H);
 
+  /* Save size */
   MG5_RndFrameW = W;
   MG5_RndFrameH = H;
+
+  /* Recalculate project */
   MG5_RndProjSet();
 } /* End of 'MG5_RndResize' function */
 
@@ -130,7 +119,7 @@ VOID MG5_RndCopyFrame( VOID )
 VOID MG5_RndStart( VOID )
 {
   INT t;
-  static INT reload_time;
+  static LONG reload_time = -1;
 
   /* Reload shader */
   if ((t = clock() - reload_time ) > 5 * CLOCKS_PER_SEC)
