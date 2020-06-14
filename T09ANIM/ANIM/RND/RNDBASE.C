@@ -24,6 +24,7 @@ VOID MG5_RndInit( HWND hWnd )
 {
   INT i;
   PIXELFORMATDESCRIPTOR pfd = {0};
+  const CHAR *Str;
 
   MG5_hRndWnd = hWnd;
   MG5_hRndDC = GetDC(hWnd);
@@ -49,6 +50,10 @@ VOID MG5_RndInit( HWND hWnd )
       MB_ICONERROR | MB_OK);
     exit(0);
   }
+  Str = glGetString(GL_VENDOR);
+  Str = glGetString(GL_RENDERER);
+  Str = glGetString(GL_VERSION);
+  Str = glGetString(GL_SHADING_LANGUAGE_VERSION);
 
   MG5_RndProgId = MG5_RndShdLoad("DEFAULT");
 

@@ -37,7 +37,7 @@ static VOID MG5_UnitClose( mg5UNIT_GRID *Uni, mg5ANIM *Ani )
  */
 static VOID MG5_UnitInit( mg5UNIT_GRID *Uni, mg5ANIM *Ani )
 {
-  /*static HBITMAP hBm, hBm1;
+  static HBITMAP hBm, hBm1;
   static BYTE *Pixels, *Pixels1;
   static BITMAP bm, bm1;
   static mg5VERTEX V[GRID_H][GRID_W];
@@ -64,17 +64,17 @@ static VOID MG5_UnitInit( mg5UNIT_GRID *Uni, mg5ANIM *Ani )
       V[y][x].P = VecSet(x - GRID_W / 2, (b1 + g1 + r1), GRID_H / 2 - y);
       V[y][x].C = Vec4Set(r / 255.0, g / 255.0, b / 255.0, 1);
     }
-  MG5_RndPrimCreateFromGrid(&Uni->Grid, V[0], GRID_W, GRID_H, TRUE);*/
+  MG5_RndPrimCreateFromGrid(&Uni->Grid, V[0], GRID_W, GRID_H, TRUE);
 
-   HBITMAP hBm = LoadImage(NULL, "hftex.bmp", IMAGE_BITMAP, 0, 0,
+   /*HBITMAP hBm = LoadImage(NULL, "hftex.bmp", IMAGE_BITMAP, 0, 0,
                           LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
   if (hBm != NULL)
   {
     BITMAP bm;
     mg5VERTEX *V;
-    INT W, H, BPL; /* width, hight and bytes per line for image */
-    BYTE *ptr;
+    INT W, H, BPL;*/ /* width, hight and bytes per line for image */
+    /*BYTE *ptr;
 
     GetObject(hBm, sizeof(bm), &bm);
     W = bm.bmWidth;
@@ -91,21 +91,21 @@ static VOID MG5_UnitInit( mg5UNIT_GRID *Uni, mg5ANIM *Ani )
         for (x = 0; x < W; x++)
         {
           BYTE
-            b = ptr[y * BPL + x * 3 + 0], /* для 8 bit - bm.BitsPixel: [y * BPL + x] для rgb */
-            g = ptr[y * BPL + x * 3 + 1],
+            b = ptr[y * BPL + x * 3 + 0], *//* для 8 bit - bm.BitsPixel: [y * BPL + x] для rgb */
+            /*g = ptr[y * BPL + x * 3 + 1],
             r = ptr[y * BPL + x * 3 + 2];
 
           V[y * W + x].P = VecSet(x - W / 2,
                                   47 * g / 255.0,
                                   H / 2 - y);
-          V[y * W + x].C = Vec4Set(r / 255.0, g / 255.0, b / 255.0, 1);
+          V[y * W + x].C = Vec4Set(r / 255.0, g / 255.0, b / 255.0, 1);*/
           /* V[y * W + x].C = Vec4Set(0, 1, 0, 1); */
-        }
+       /* }
         MG5_RndPrimCreateFromGrid(&Uni->Grid, V, W, H, TRUE);
       free(V);
     }
     DeleteObject(hBm);
-  }
+  }*/
 
 } /* End of 'MG5_UnitInit' function */
 
