@@ -12,7 +12,9 @@
 #include "glew.h"
 #include <gl/gl.h>
 
+
 #include "../../def.h"
+#include "res/rndres.h"
 
 /* Data */
 
@@ -22,7 +24,7 @@ extern HDC MG5_hRndDC;                   /* Work window memory device context  *
 /*extern HBITMAP MG5_hRndBmFrame;*/      /* Work window background bitmap handle */
 extern HGLRC MG5_hRndGLRC;
 extern INT MG5_RndFrameH, MG5_RndFrameW; /* Work window size */
-extern INT MG5_RndProgId;                /* Global shader for checking */ 
+         
 
 
 extern DBL
@@ -36,6 +38,11 @@ extern MATR
   MG5_RndMatrProj, /* Projection coordinate system matrix */
   MG5_RndMatrVP;   /* Stored (View * Proj) matrix */
 
+extern VEC 
+  MG5_RndCamLoc,
+  MG5_RndCamRight,
+  MG5_RndCamUp,
+  MG5_RndCamDir;
 
 /* Vertex type */
 typedef struct tagmg5VERTEX
@@ -64,6 +71,7 @@ typedef struct tagmg5PRIM
     VBuf, 
     IBuf;
   INT NumOfElements;   /* Number of vertices */
+  INT MtlNo; /* Material number in material array */
   MATR Trans;   /* Transformation matrix */
 } mg5PRIM;
 
@@ -206,7 +214,8 @@ BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName );
  * RETURNS:
  *   (BOOL) result.
  */
-BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH );
+
+BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL RX, DBL RY, DBL RZ, INT SplitW, INT SplitH );
 
 /* Create primitive of torus function 
  * ARGUMENTS:
@@ -221,24 +230,9 @@ BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
  * RETURNS:
  *   (BOOL) result.
  */
-BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH );
+BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL RX, DBL r, INT SplitW, INT SplitH );
 
-/* Load shader program from .GLSL files function.
- * ARGUMENTS:
- *   - shader file path to load (path\***.glsl):
- *       CHAR *ShaderFileNamePrefix;
- * RETURNS:
- *   (INT) load shader program Id.
- */
-INT MG5_RndShdLoad( CHAR *ShaderFileNamePrefix );
 
-/* Unload shader program from memory files function.
- * ARGUMENTS:
- *   - shader program Id:
- *       INT ProgId;
- * RETURNS: None.
- */
-VOID MG5_RndShdDelete( INT ProgId );
 
 /* Prim creation from vertex grid function 
  * ARGUMENTS:

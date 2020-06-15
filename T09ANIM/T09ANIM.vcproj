@@ -241,13 +241,41 @@
 						>
 					</File>
 					<File
-						RelativePath=".\ANIM\RND\RNDSHD.C"
-						>
-					</File>
-					<File
 						RelativePath=".\wglew.h"
 						>
 					</File>
+					<Filter
+						Name="Resources"
+						>
+						<File
+							RelativePath=".\ANIM\RND\RES\IMAGE.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\IMAGE.H"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDMTL.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDRES.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDRES.H"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDSHD.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDTXT.C"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter

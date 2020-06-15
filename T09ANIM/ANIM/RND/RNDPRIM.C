@@ -110,275 +110,277 @@ VOID MG5_RndPrimFree( mg5PRIM *Pr )
  */
 VOID MG5_RndPrimDraw( mg5PRIM *Pr, MATR World )
 {
-  MATR wvp = MatrMulMatr3(Pr->Trans, World, MG5_RndMatrVP);
-  INT loc, gl_prim_type;
+  MATR
+    w = MatrMulMatr(Pr->Trans, World),
+    winv = MatrTranspose(MatrInverse(w)),
+    wvp = MatrMulMatr(w, MG5_RndMatrVP);
+  INT gl_prim_type = Pr->Type == MG5_RND_PRIM_LINES ? GL_LINES :
+                     Pr->Type == MG5_RND_PRIM_TRIMESH ? GL_TRIANGLES :
+                     Pr->Type == MG5_RND_PRIM_TRISTRIP ? GL_TRIANGLE_STRIP :
+                     GL_POINTS;
+  INT loc, ProgId;
 
-  gl_prim_type = Pr->Type == MG5_RND_PRIM_LINES ? GL_LINES :
-             Pr->Type == MG5_RND_PRIM_TRIMESH ? GL_TRIANGLES :
-             Pr->Type == MG5_RND_PRIM_TRISTRIP ? GL_TRIANGLE_STRIP :
-             GL_POINTS;
   glLoadMatrixf(wvp.A[0]);
 
-  glUseProgram(MG5_RndProgId);
-
-  /* Pass render uniform */
-  if ((loc = glGetUniformLocation(MG5_RndProgId, "MatrWVP")) != -1)
+  ProgId = MG5_RndMtlApply(Pr->MtlNo);
+ 
+  /* Pass render uniforms */
+  if ((loc = glGetUniformLocation(ProgId, "MatrWVP")) != -1)
     glUniformMatrix4fv(loc, 1, FALSE, wvp.A[0]);
-  if ((loc = glGetUniformLocation(MG5_RndProgId, "Time")) != -1)
+  if ((loc = glGetUniformLocation(ProgId, "MatrW")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, w.A[0]);
+  if ((loc = glGetUniformLocation(ProgId, "MatrWinv")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, winv.A[0]);
+  if ((loc = glGetUniformLocation(ProgId, "CamLoc")) != -1)
+    glUniform3fv(loc, 1, &MG5_RndCamLoc.X);
+  if ((loc = glGetUniformLocation(ProgId, "Time")) != -1)
     glUniform1f(loc, MG5_Anim.Time);
-  if ((loc = glGetUniformLocation(MG5_RndProgId, "GlobalTime")) != -1)
-    glUniform1f(loc, MG5_Anim.GlobalTime);
-
-  /* Draw all triangles */
+  /* Draw primitive */
+    glBindVertexArray(Pr->VA);
   if (Pr->IBuf != 0)
   {
-    glBindVertexArray(Pr->VA);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->IBuf);
     glDrawElements(gl_prim_type, Pr->NumOfElements, GL_UNSIGNED_INT, NULL);
-    glBindVertexArray(0);
   }
   else
-  {
-    glBindVertexArray(Pr->VA);
     glDrawArrays(gl_prim_type, 0, Pr->NumOfElements);
-    glBindVertexArray(0);
-  }
-  glUseProgram(0);
-} /* End of 'MG5_RndPrimDraw' function */
+
+ glBindVertexArray(0);
+ glUseProgram(0);
+}
+/* End of 'MG5_RndPrimDraw' function */
 
 
-/*  Create primitive of sphere function.
- * ARGUMENTS:
- *   -Prim structure:
- *       mg5PRIM *Pr;
- *   -Vector (position):
- *       VEC C;
- *   - Radius:
- *       DBL R;
- *   - WIdth and height:
- *       INT SplitW, SplitH;
- * RETURNS:
- *   (BOOL) result.
- */
-BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH )
-{
-  INT i, j, m, n, noofv, noofi, size;
-  DOUBLE theta, phi;
-  mg5VERTEX *V;
-  INT *Ind;
-
-  memset(Pr, 0, sizeof(mg5PRIM));
-
-  noofv = SplitW * SplitH;
-  noofi = (SplitW - 1) * 2 * (SplitH - 1) * 3; 
-  size = sizeof(mg5VERTEX) * noofv + sizeof(INT) * noofi;
-
-  if ((V = malloc(size)) == NULL)
-    return FALSE;
-  Ind = (INT *)(V + noofv);
-
-  for (i = 0, theta = 0, m = 0; i < SplitH; i++, theta += PI / (SplitH - 1))
-    for (j = 0, phi = 0; j < SplitW; j++, phi += 2 * PI / (SplitW - 1))
-    {
-
-       FLT
-        x = cos(phi) * sin(theta),
-        y = cos(theta),
-        z = sin(phi) * sin(theta);
-
-       V[m].P = (VecSet(C.X + R * x,
-                        C.Y + R * y,
-                        C.Z + R * z));
-       V[m].C = Vec4Set(0.9, 0.13, 0.47, 1);
-       V[m].N = VecSet(x, y, z);
-       m++;
-    }
-
-  for (i = 0, m = 0, n = 0; i < SplitH - 1; i++, m++)
-    for (j = 0; j < SplitW - 1; j++, m++)
-    {
-      Ind[n++] = m;
-      Ind[n++] = m + SplitW;
-      Ind[n++] = m + 1;
-
-      Ind[n++] = m + SplitW;
-      Ind[n++] = m + SplitW + 1;
-      Ind[n++] = m + 1;
-    }
-  MG5_RndPrimCreate(Pr,MG5_RND_PRIM_TRIMESH, V, noofv, Ind, noofi);
-  free(V);
-  return TRUE;
-} /* End of 'MG5_RndPrimCreateSphere' func */
-
-
-/* Create primitive of torus function 
+/* Create primitive of sphere function 
  * ARGUMENTS:
  *   - prim struct:
  *       mg5PRIM *Pr.
- *   - centre coordinate:
+ *   - centr coordinate:
  *       VEC C.
  *   - radius
- *       DBL R.
+ *       DBL RX, RY, RZ.
  *   - number of segments.
  *       INT SplitW, INT SplitH
  * RETURNS:
- *   (BOOL) result.
+ *   (BOOL) work.
  */
-BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH )
+BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL RX, DBL RY, DBL RZ, INT SplitW, INT SplitH )
 {
-  INT i, j, m, n, noofv, noofi, size, r = 3;
-  DOUBLE theta, phi;
+  DBL theta, phi;
+  INT i, j, k, f;
+  INT size;
   mg5VERTEX *V;
   INT *Ind;
 
   memset(Pr, 0, sizeof(mg5PRIM));
-
-  noofv = SplitW * SplitH;
-  noofi = (SplitW - 1) * 2 * (SplitH - 1) * 3; 
-  size = sizeof(mg5VERTEX) * noofv + sizeof(INT) * noofi;
-
+  size = sizeof(mg5VERTEX) * SplitW * SplitH + sizeof(INT) * (SplitW - 1) * (SplitH - 1) * 2 * 3;
   if ((V = malloc(size)) == NULL)
     return FALSE;
-  Ind = (INT *)(V + noofv);
+  Ind = (INT *)(V + SplitW * SplitH);
 
-  for (i = 0, theta = 0, m = 0; i < SplitH; i++, theta += PI / (SplitH - 1))
-    for (j = 0, phi = 0; j < SplitW; j++, phi += 2 * PI / (SplitW - 1))
+  /* Build vertex array */
+  for (theta = 0, i = 0, k = 0; i < SplitH; i++, theta += PI / (SplitH - 1))
+    for (phi = 0, j = 0; j < SplitW; j++, phi += 2 * PI / (SplitW - 1))
     {
+      FLT
+        x = sin(phi) * sin(theta),
+        y = cos(theta),
+        z = cos(phi) * sin(theta);
 
-       FLT
-        x = (R + r * cos(phi)) * cos(theta),
-        y = (R + r * cos(phi)) * sin (theta),
-        z = r * sin(phi);
+      V[k].P = VecSet(C.X + RX * x, C.Y + RY * y, C.Z + RZ * z);
+      V[k].T = Vec2Set(C.X + RX * x, C.Y + RY * y);
+      V[k].N = VecSet(x, y, z);
+      V[k].C = Vec4Set1(0);
+      k++;
+    }
+  /* Build index array */
+  for (i = 0, k = 0, f = 0; i < SplitH - 1; i++, k++)
+    for (j = 0; j < SplitW - 1; j++, k++)
+    {
+      /* first triangle */
+      Ind[f++] = k;
+      Ind[f++] = k + 1;
+      Ind[f++] = k + SplitW;
 
-       V[m].P = (VecSet(C.X + x,
-                        C.Y + y,
-                        C.Z + z));
-       V[m].C = Vec4Set(0.8, 0.3, 0.47, 1);
-       V[m].N = VecSet(x, y, z);
-       m++;
+      /* second triangle */
+      Ind[f++] = k + SplitW;
+      Ind[f++] = k + 1;
+      Ind[f++] = k + SplitW + 1;
     }
 
-  for (i = 0, m = 0, n = 0; i < SplitH - 1; i++, m++)
-    for (j = 0; j < SplitW - 1; j++, m++)
-    {
-      Ind[n++] = m;
-      Ind[n++] = m + SplitW;
-      Ind[n++] = m + 1;
-
-      Ind[n++] = m + SplitW;
-      Ind[n++] = m + SplitW + 1;
-      Ind[n++] = m + 1;
-    }
-  MG5_RndPrimCreate(Pr, MG5_RND_PRIM_TRIMESH, V, noofv, Ind, noofi);
+  MG5_RndPrimCreate(Pr, MG5_RND_PRIM_TRIMESH, V, SplitW * SplitH, Ind, (SplitW - 1) * (SplitH - 1) * 2 * 3);
   free(V);
   return TRUE;
-} /* End of 'MG5_RndPrimCreateTorus' function */
+} /* End of 'MG5_RndPrimCreateSphere' function */
 
 
-/* Load primitive from .OBJ file function.
+/* Create prim of top function 
  * ARGUMENTS:
- *   -Prim struct:
- *       mg5PRIM *Pr;
- *   -File name:
- *       CHAR *FileName;
+ *   - prim struct:
+ *       mg5PRIM *Pr.
+ *   - centr coordinate:
+ *       VEC C.
+ *   - radius
+ *       DBL R, r.
+ *   - number of segments.
+ *       INT SplitW, INT SplitH
  * RETURNS:
- *   (BOOL) result.
+ *   (BOOL) work.
  */
-BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName )
+BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT SplitH )
 {
-  FILE *F;
-  static CHAR Buf[1000];
+  DBL theta, phi;
+  INT i, j, k, f;
+  INT size;
   mg5VERTEX *V;
   INT *Ind;
-  INT nv = 0, nf = 0, size, i;
 
   memset(Pr, 0, sizeof(mg5PRIM));
+  size = sizeof(mg5VERTEX) * SplitW * SplitH + sizeof(INT) * (SplitW - 1) * (SplitH - 1) * 2 * 3;
+  if ((V = malloc(size)) == NULL)
+    return FALSE;
+  Ind = (INT *)(V + SplitW * SplitH);
 
+  /* Build vertex array */
+  for (theta = 0, i = 0, k = 0; i < SplitH; i++, theta += 2 * PI / (SplitH - 1))
+    for (phi = 0, j = 0; j < SplitW; j++, phi += 2 * PI / (SplitW - 1))
+    {
+      V[k].P = VecSet(C.X + (R + r * cos(theta)) * cos(phi),
+                      C.Y + r * sin(theta),
+                      C.Z + (R + r * cos(theta)) * sin(phi));
+      V[k].N = VecSet((R + r * cos(theta)) * cos(phi),
+                      r * sin(theta),
+                      (R + r * cos(theta)) * sin(phi));
+
+      V[k].T = Vec2Set(C.X + (R + r * cos(theta)) * cos(phi), C.Y + r * sin(theta));
+      V[k].C = Vec4Set(0.8, 0.3, 0.26, 1);
+      k++;
+    }
+
+  /* Build index array */
+  for (i = 0, k = 0, f = 0; i < SplitH - 1; i++, k++)
+    for (j = 0; j < SplitW - 1; j++, k++)
+    {
+      /* First triangle */
+      Ind[f++] = k;
+      Ind[f++] = k + 1;
+      Ind[f++] = k + SplitW;
+
+      /* Second triangle */
+      Ind[f++] = k + SplitW;
+      Ind[f++] = k + 1;
+      Ind[f++] = k + SplitW + 1;
+    }
+
+  MG5_RndPrimCreate(Pr, MG5_RND_PRIM_TRIMESH, V, SplitW * SplitH, Ind, (SplitW - 1) * (SplitH - 1) * 2 * 3);
+  free(V);
+  return TRUE;
+} /* End of 'MG5_RndPrimCreateSphere' function */
+
+
+/* Load primitive from '*.OBJ' file function.
+ * ARGUMENTS:
+ *   - pointer to primitive to create:
+ *       mg5PRIM *Pr;
+ *   - '*.OBJ' file name:
+ *       CHAR *FileName;
+ * RETURNS:
+ *   (BOOL) TRUE if success, FALSE otherwise.
+ */
+BOOL MG5_RndPrimLoad(mg5PRIM *Pr, CHAR *FileName )
+{
+  INT vn = 0, fn = 0;
+  FILE *F;
+  CHAR Buf[1000];
+  mg5VERTEX *V;
+  INT *Ind, size, i;
+
+  memset(Pr, 0, sizeof(mg5PRIM));
   if ((F = fopen(FileName, "r")) == NULL)
     return FALSE;
-  
-  /* Vertex and facet count */
-  while (fgets(Buf, sizeof(Buf), F) != NULL)
-    if (Buf[0] == 'v' && Buf[1] == ' ')
-      nv++;
-    else if (Buf[0] == 'f' && Buf[1] == ' ')
-      nf++;
-  
-  size = sizeof(mg5VERTEX) * nv + sizeof(INT) * (nf * 3);
 
-  if ((V = malloc(size)) == NULL)
+  /* Count vertex and index quantities */
+  while (fgets(Buf, sizeof(Buf) - 1, F) != NULL)
   {
-    fclose(F);
-    return FALSE;
+    if (Buf[0] == 'v' && Buf[1] == ' ')
+      vn++;
+    else if (Buf[0] == 'f' && Buf[1] == ' ')
+      fn++;
   }
 
-  memset(V, 0, size);
-  Ind = (INT *)(V + nv);
+  size = sizeof(mg5VERTEX) * vn + sizeof(INT) * fn * 3;
+  if ((V = malloc(size)) == NULL)
+    return FALSE;
+  Ind = (INT *)(V + vn);
 
-  /* Load geometry data */
+  /* Read vertices and facets data */
   rewind(F);
-  nv = nf = 0;
-  while (fgets(Buf, sizeof(Buf), F) != NULL)
+  vn = fn = 0;
+  while (fgets(Buf, sizeof(Buf) - 1, F) != NULL)
+  {
     if (Buf[0] == 'v' && Buf[1] == ' ')
     {
       DBL x, y, z;
-      sscanf(Buf + 2, "%lf %lf %lf", &x, &y, &z);
-      V[nv++].P = VecSet(x, y, z);
+
+      sscanf(Buf + 2, "%lf%lf%lf", &x, &y, &z);
+      V[vn++].P = VecSet(x, y, z);
     }
     else if (Buf[0] == 'f' && Buf[1] == ' ')
     {
       INT n1, n2, n3;
 
-      sscanf(Buf + 2, "%d %d %d", &n1, &n2, &n3) == 3 ||
-      sscanf(Buf + 2, "%d/%*d %d/%*d %d/%*d", &n1, &n2, &n3) == 3 ||
-      sscanf(Buf + 2, "%d//%*d %d//%*d %d//%*d", &n1, &n2, &n3) == 3 ||
-      sscanf(Buf + 2, "%d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &n1, &n2, &n3) == 3;
-
-      Ind[nf++] = n1 - 1;
-      Ind[nf++] = n2 - 1;
-      Ind[nf++] = n3 - 1;
+      /* Read one of possible facet references */
+      sscanf(Buf + 2, "%d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &n1, &n2, &n3) == 3 ||
+        sscanf(Buf + 2, "%d//%*d %d//%*d %d//%*d", &n1, &n2, &n3) == 3 ||
+        sscanf(Buf + 2, "%d/%*d %d/%*d %d/%*d", &n1, &n2, &n3) == 3 ||
+        sscanf(Buf + 2, "%d %d %d", &n1, &n2, &n3);
+      Ind[fn++] = n1 - 1;
+      Ind[fn++] = n2 - 1;
+      Ind[fn++] = n3 - 1;
     }
+  }
 
-  for (i = 0; i < nv; i++)
+  /* Calculate normale */
+  for (i = 0; i < vn; i++)
     V[i].N = VecSet(0, 0, 0);
 
-  for (i = 0; i < nf; i += 3)
+  for (i = 0; i < fn; i += 3)
   {
-    VEC
-      p0 = V[Ind[i]].P,
-      p1 = V[Ind[i + 1]].P,
-      p2 = V[Ind[i + 2]].P,
-      N = VecNormalize(VecCrossVec(VecSubVec(p1, p2), VecSubVec(p2, p0)));
-
-      V[Ind[i]].N = VecAddVec(V[Ind[i]].N, N);
-      V[Ind[i + 1]].N = VecAddVec(V[Ind[i + 1]].N, N);
-      V[Ind[i + 2]].N = VecAddVec(V[Ind[i + 2]].N, N);
+    VEC P0 = V[Ind[i]].P,
+        P1 = V[Ind[i + 1]].P,
+        P2 = V[Ind[i + 2]].P,
+        N = VecNormalize(VecCrossVec(VecSubVec(P1, P0), VecSubVec(P0, P2)));
+    V[Ind[i]].N = VecAddVec(V[Ind[i]].N, N);
+    V[Ind[i + 1]].N = VecAddVec(V[Ind[i + 1]].N, N);
+    V[Ind[i + 2]].N = VecAddVec(V[Ind[i + 2]].N, N);
   }
-  for (i = 0; i < nv; i++)
-  { 
+  for (i = 0; i < vn; i++)
+  {
     V[i].N = VecNormalize(V[i].N);
-    V[i].C = Vec4Set(0.8, 0.47, 0.28, 1);
+    V[i].C = Vec4Set(0.80, 0.7, 0.4, 1);
   }
+
+  MG5_RndPrimCreate(Pr, MG5_RND_PRIM_TRIMESH, V, vn, Ind, fn);
 
   fclose(F);
-  MG5_RndPrimCreate(Pr, MG5_RND_PRIM_TRIMESH, V, nv, Ind, nf );
   free(V);
   return TRUE;
-} /* End of 'MG5_RndPrimLoad' func */
+} /* End of 'MG5_RndPrimLoad' function */
 
-/* Prim creation from vertex grid function 
+
+/* Create grid primitive function.
  * ARGUMENTS:
- *    -pointer to prim:
+ *   - pointer to primitive to create:
  *       mg5PRIM *Pr;
- *    -pointer to vertex array:
+ *   - new primitive vertex array:
  *       mg5VERTEX *V;
- *    -weight and heidht:
+ *   - size of grid:
  *       INT W, H;
- *    - normal evalation flag:
- *       BOOL IsNormalsNeed;
- * RETURNS: BOOL;
+ *   - need or nor normolize:
+ *       BOOL NeedNorm;
+ * RETURNS: None.
  */
- BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL NeedNorm )
+BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL NeedNorm )
 {
   INT i, j, k;
   INT *Ind;
@@ -397,7 +399,6 @@ BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName )
     if (i != H - 2)
       Ind[k++] = -1;
   }
-
   if (NeedNorm)
   {
     for (i = 0; i < W * H; i++)
@@ -434,6 +435,7 @@ BOOL MG5_RndPrimLoad( mg5PRIM *Pr, CHAR *FileName )
 
   free(Ind);
   return TRUE;
-} /* End of 'MG5_RndPrimCreateFromGrid' */
+} /* End of 'MG5_RndPrimCreateFromGrid' function */
+
 
 /* END OF 'RNDPRIM.C' FILE */

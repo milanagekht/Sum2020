@@ -55,13 +55,13 @@ VOID MG5_RndInit( HWND hWnd )
   Str = glGetString(GL_VERSION);
   Str = glGetString(GL_SHADING_LANGUAGE_VERSION);
 
-  MG5_RndProgId = MG5_RndShdLoad("DEFAULT");
+  //MG5_RndProgId = MG5_RndShdLoad("DEFAULT");
 
   glClearColor(1.30, 0.50, 0.8, 1);
   glEnable(GL_DEPTH_TEST);
 
   glEnable(GL_PRIMITIVE_RESTART);
-  //glPrimitiveRestartIndex(-1);
+  glPrimitiveRestartIndex(-1);
 
   /* Set default parameters */
   MG5_RndFrameH = 102;
@@ -81,6 +81,7 @@ VOID MG5_RndInit( HWND hWnd )
  */
 VOID MG5_RndClose( VOID )
 {
+  MG5_RndResClose();
   wglMakeCurrent(NULL, NULL);
   wglDeleteContext(MG5_hRndGLRC);
 } /* End of 'MG5_RndClose' function */
@@ -125,13 +126,11 @@ VOID MG5_RndStart( VOID )
 {
   INT t;
   static LONG reload_time = -1;
-
+#ifndef NDEBUG
   /* Reload shader */
   if ((t = clock() - reload_time ) > 5 * CLOCKS_PER_SEC)
-  {
-    MG5_RndShdDelete(MG5_RndProgId);
-    MG5_RndProgId = MG5_RndShdLoad("DEFAULT");
-  }
+     MG5_RndShdUpdate();
+#endif /* NDEBUG */
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 } /* End of 'MG5_RndStart' function */
@@ -179,6 +178,11 @@ VOID MG5_RndCamSet( VEC Loc, VEC At, VEC Up )
 {
   MG5_RndMatrView = MatrView(Loc, At, Up);
   MG5_RndMatrVP = MatrMulMatr(MG5_RndMatrView, MG5_RndMatrProj);
+
+  MG5_RndCamLoc = Loc;
+  MG5_RndCamRight = VecSet(MG5_RndMatrView.A[0][0], MG5_RndMatrView.A[1][0], MG5_RndMatrView.A[2][0]);
+  MG5_RndCamUp = VecSet(MG5_RndMatrView.A[0][1], MG5_RndMatrView.A[1][1], MG5_RndMatrView.A[2][1]);
+  MG5_RndCamDir = VecSet(-MG5_RndMatrView.A[0][2], -MG5_RndMatrView.A[1][2], -MG5_RndMatrView.A[2][2]);
 } /* End of 'MG5_RndCamSet' function */
 
 /* END OF 'RNDBASE.C' FILE */

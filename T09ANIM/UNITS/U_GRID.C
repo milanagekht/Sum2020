@@ -5,9 +5,8 @@
  */
 
 #include "../units.h"
+#include "../anim/rnd/res/image.h"
 
-#define GRID_H 102
-#define GRID_W 102
 
 typedef struct tagmg5UNIT_GRID
 {
@@ -37,76 +36,32 @@ static VOID MG5_UnitClose( mg5UNIT_GRID *Uni, mg5ANIM *Ani )
  */
 static VOID MG5_UnitInit( mg5UNIT_GRID *Uni, mg5ANIM *Ani )
 {
-  static HBITMAP hBm, hBm1;
-  static BYTE *Pixels, *Pixels1;
-  static BITMAP bm, bm1;
-  static mg5VERTEX V[GRID_H][GRID_W];
-  INT b, g, r, x, y, b1, g1, r1;
+  mg5IMAGE img1, img2;
+  mg5VERTEX *V;
+  INT x, y, b, g, r, a, d;
 
-  hBm = LoadImage(NULL, "hftex.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-  hBm1 = LoadImage(NULL, "hf.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-  GetObject(hBm, sizeof(bm), &bm);
-  GetObject(hBm1, sizeof(bm1), &bm1);
-
-  Pixels = bm.bmBits;
-  Pixels1 = bm1.bmBits;
-  for (y = 0; y < GRID_H; y++)
-    for (x = 0; x < GRID_W - 2; x++)
-    {
-      b = Pixels[bm.bmWidthBytes * y + x * (bm.bmBitsPixel / 8) + 0];
-      g = Pixels[bm.bmWidthBytes * y + x * (bm.bmBitsPixel / 8) + 1];
-      r = Pixels[bm.bmWidthBytes * y + x * (bm.bmBitsPixel / 8) + 2];
-      
-      b1 = Pixels1[bm1.bmWidthBytes * y + x * (bm1.bmBitsPixel / 8) + 0];
-      g1 = Pixels1[bm1.bmWidthBytes * y + x * (bm1.bmBitsPixel / 8) + 1];
-      r1 = Pixels1[bm1.bmWidthBytes * y + x * (bm1.bmBitsPixel / 8) + 2];
-
-      V[y][x].P = VecSet(x - GRID_W / 2, (b1 + g1 + r1), GRID_H / 2 - y);
-      V[y][x].C = Vec4Set(r / 255.0, g / 255.0, b / 255.0, 1);
-    }
-  MG5_RndPrimCreateFromGrid(&Uni->Grid, V[0], GRID_W, GRID_H, TRUE);
-
-   /*HBITMAP hBm = LoadImage(NULL, "hftex.bmp", IMAGE_BITMAP, 0, 0,
-                          LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-
-  if (hBm != NULL)
+  if (MG5_ImgLoad(&img1, "hf.bmp") && MG5_ImgLoad(&img2, "hftex.bmp") && (V = malloc(sizeof(mg5VERTEX) * img1.H * img1.W)) != NULL)
   {
-    BITMAP bm;
-    mg5VERTEX *V;
-    INT W, H, BPL;*/ /* width, hight and bytes per line for image */
-    /*BYTE *ptr;
+    for (y = 0; y < img1.H; y++)
+      for (x = 0; x < img1.W; x++)
+      {
+        b = img2.Pixels[(img2.W * y + x) * 4 + 0];
+        g = img2.Pixels[(img2.W * y + x) * 4 + 1];
+        r = img2.Pixels[(img2.W * y + x) * 4 + 2];
+        a = img2.Pixels[(img2.W * y + x) * 4 + 3];
+        
+        d = img1.Pixels[(img1.W * y + x) * 4 + 1];
 
-    GetObject(hBm, sizeof(bm), &bm);
-    W = bm.bmWidth;
-    H = bm.bmHeight;
-    BPL = bm.bmWidthBytes;
-    ptr = bm.bmBits;
+        V[img1.W * y + x].P = VecSet(x - img1.W / 2, d, img1.H / 2 - y);
+        V[img1.W * y + x].C = Vec4Set(r / 255.0, g / 255.0, b / 255.0, 1);
+      }
+    MG5_RndPrimCreateFromGrid(&Uni->Grid, V, img1.W, img1.H, TRUE);
+    Uni->Grid.MtlNo = 0;
+  }
 
-    if ((V = malloc(sizeof(mg5VERTEX) * W * H)) != NULL)
-    {
-      INT x, y;
-
-      memset(V, 0, sizeof(mg5VERTEX) * W * H);
-      for (y = 0; y < H; y++)
-        for (x = 0; x < W; x++)
-        {
-          BYTE
-            b = ptr[y * BPL + x * 3 + 0], *//* для 8 bit - bm.BitsPixel: [y * BPL + x] для rgb */
-            /*g = ptr[y * BPL + x * 3 + 1],
-            r = ptr[y * BPL + x * 3 + 2];
-
-          V[y * W + x].P = VecSet(x - W / 2,
-                                  47 * g / 255.0,
-                                  H / 2 - y);
-          V[y * W + x].C = Vec4Set(r / 255.0, g / 255.0, b / 255.0, 1);*/
-          /* V[y * W + x].C = Vec4Set(0, 1, 0, 1); */
-       /* }
-        MG5_RndPrimCreateFromGrid(&Uni->Grid, V, W, H, TRUE);
-      free(V);
-    }
-    DeleteObject(hBm);
-  }*/
-
+  MG5_ImgFree(&img1);
+  MG5_ImgFree(&img2);
+  free(V);
 } /* End of 'MG5_UnitInit' function */
 
 /* Bounce ball unit inter frame events handle function.

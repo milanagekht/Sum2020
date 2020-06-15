@@ -3,9 +3,21 @@
 typedef struct
 {
   MG5_UNIT_BASE_FIELDS;
-  VEC Pos;
   mg5PRIM Ball;
 } mg5UNIT_BALL;
+
+/* Bounce ball unit deinitialization function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       mg5UNIT_BALL *Uni;
+ *   - animation context:
+ *       mg5ANIM *Ani;
+ * RETURNS: None.
+ */
+static VOID MG5_UnitClose( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
+{
+  MG5_RndPrimFree(&Uni->Ball);
+} /* End of 'MG5_UnitClose' function */
 
 /* Bounce ball unit initialization function.
  * ARGUMENTS:
@@ -17,11 +29,15 @@ typedef struct
  */
 static VOID MG5_UnitInit( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
 {
-  //mg5VERTEX V[] = {{{0, 0, 0}}, {{1, 0, 0}}, {{0, 1, 0}}};
+  
+  mg5MATERIAL mtl = MG5_RndMaterials[0];
 
-  //MG5_RndPrimCreate(&Uni->Ball, V, 3, NULL, 0);
-  MG5_RndPrimCreateSphere(&Uni->Ball, VecSet(0, 0, 0), 5, 23, 18);
-  Uni->Pos = VecMulNum(VecSet(Rand1(), Rand1(), Rand1()), 100);
+  MG5_RndPrimCreateSphere(&Uni->Ball, VecSet1(0), 1000, 1000, 1000, 8 * 18, 8* 18);
+  mtl.Tex[0] = MG5_RndTexAdd("sky.bmp");                                
+  mtl.Kd = VecSet1(0.8);
+  mtl.Ks = VecSet1(0.8);
+  mtl.Ph = 90;
+  Uni->Ball.MtlNo = MG5_RndMtlAdd(&mtl);
 } /* End of 'MG5_UnitInit' function */
 
 /* Bounce ball unit inter frame events handle function.
@@ -34,7 +50,6 @@ static VOID MG5_UnitInit( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
  */
 static VOID MG5_UnitResponse( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
 {
-  /*Uni->Pos.X += Ani->DeltaTime * 2.5;*/
 } /* End of 'MG5_UnitResponse' function */
 
 /* Bounce ball unit render function.
@@ -47,16 +62,8 @@ static VOID MG5_UnitResponse( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
  */
 static VOID MG5_UnitRender( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
 {
-  MG5_RndPrimDraw(&Uni->Ball, 
-                  MatrMulMatr(MatrScale(VecSet(1, 1, 1)),
-                  MatrTranslate(Uni->Pos)));
-  /*MG5_RndPrimDraw(&Uni->Ball, MatrIdentity());*/
+  MG5_RndPrimDraw(&Uni->Ball, MatrIdentity());
 } /* End of 'MG5_UnitRender' function */
- 
-static VOID MG5_UnitClose( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
-{
-  MG5_RndPrimFree(&Uni->Ball);
-}
 
 /* Unit ball creation function.
  * ARGUMENTS: None.
@@ -75,6 +82,7 @@ mg5UNIT * MG5_UnitCreateBall( VOID )
   Uni->Response = (VOID *)MG5_UnitResponse;
   Uni->Render = (VOID *)MG5_UnitRender;
   Uni->Close = (VOID *)MG5_UnitClose;
-
   return (mg5UNIT *)Uni;
 } /* End of 'MG5_UnitCreateBall' function */
+
+/* END OF 'U_BALLS.C' FILE */

@@ -13,7 +13,6 @@ HDC MG5_hRndDC;                  /* Work window memory device context  */
 /*HDC MG5_hRndDCFrame;*/         /* Work window memory device context  */
 /*HBITMAP MG5_hRndBmFrame;*/
 HGLRC MG5_hRndGLRC;
-INT MG5_RndProgId;
 INT MG5_RndFrameH, MG5_RndFrameW; /* Work window size */
 
 
@@ -28,5 +27,11 @@ MATR
   MG5_RndMatrProj, /* Projection coordinate system matrix */
   MG5_RndMatrVP;   /* Stored (View * Proj) matrix */
 
+
+VEC 
+  MG5_RndCamLoc,
+  MG5_RndCamRight,
+  MG5_RndCamUp,
+  MG5_RndCamDir;
 
 /* END OF 'RNDDATA.C' FILE */

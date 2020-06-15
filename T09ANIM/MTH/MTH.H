@@ -58,7 +58,56 @@ __inline DBL Rand1( VOID )
 { 
   return 2.0 * rand() / (DBL)RAND_MAX - 1;
 }
+/* Create vectors with one coordinate function.
+ * ARGUMENTS:
+ *   - Vector coordinate:
+ *       FLT X;
+ * RETURNS:
+ *   (VEC) result vector.
+ */
+__inline VEC VecSet1( FLT X )
+{
+  VEC v;
 
+  v.X = X;
+  v.Y = X;
+  v.Z = X;
+  return v;
+} /* End of 'VecSet1' function */
+
+/* Create 2D vectors with one coordinate function.
+ * ARGUMENTS:
+ *   - Vector coordinate:
+ *       FLT X;
+ * RETURNS:
+ *   (VEC2) result vector.
+ */
+__inline VEC2 Vec2Set1( FLT X )
+{
+  VEC2 v;
+
+  v.X = X;
+  v.Y = X;
+  return v;
+} /* End of 'Vec2Set1' function */
+
+/* Create 4D vectors with one coordinate function.
+ * ARGUMENTS:
+ *   - Vector coordinate:
+ *       FLT X;
+ * RETURNS:
+ *   (VEC4) result vector.
+ */
+__inline VEC4 Vec4Set1( FLT X )
+{
+  VEC4 v;
+
+  v.X = X;
+  v.Y = X;
+  v.Z = X;
+  v.W = X;
+  return v;
+} /* End of 'Vec4Set1' function */
 
 __inline VEC VecSet(FLT X, FLT Y, FLT Z)
 {
@@ -66,6 +115,21 @@ __inline VEC VecSet(FLT X, FLT Y, FLT Z)
 
   return v;
 }
+
+/* Create 2D vectors function.
+ * ARGUMENTS:
+ *   - Vector coordinates:
+ *       FLT X, Y;
+ * RETURNS:
+ *   (VEC2) result vector.
+ */
+__inline VEC2 Vec2Set( FLT X, FLT Y ){
+  VEC2 v;
+
+  v.X = X;
+  v.Y = Y;
+  return v;
+} /* End of 'Vec2Set' function */
 
 __inline VEC4 Vec4Set(FLT X, FLT Y, FLT Z, FLT W)
 {
