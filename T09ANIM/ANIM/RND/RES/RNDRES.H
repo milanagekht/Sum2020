@@ -11,9 +11,9 @@
 #include "image.h"
 
 #define MG5_STR_MAX  300
-#define MG5_MAX_TEXTURES 30
+#define MG5_MAX_TEXTURES 30000
 #define MG5_MAX_SHADERS  47
-#define MG5_MAX_MATERIALS 50
+#define MG5_MAX_MATERIALS 500
 
 /* Shader program store type */
 typedef struct tagmg5SHADER
@@ -154,7 +154,26 @@ VOID MG5_RndMtlClose( VOID );
  * RETURNS: None.
  */
 VOID MG5_RndResClose( VOID );
+
+/* Add material function.
+ * ARGUMENTS:
+ *        mtl.
+ * RETURNS:
+ *   (INT) added texture table number.
+ */
 INT MG5_RndMtlAdd( mg5MATERIAL *Mtl );
+
+/* Get material pointer by material table number function.
+ * ARGUMENTS:  
+ *            number of material at material table.
+ */
+mg5MATERIAL * MG5_RndMtlGet( INT MtlNo );
+
+/* Get default material  function.
+ * ARGUMENTS:  
+ *            None.
+ */
+mg5MATERIAL MG5_RndMtlGetDef( VOID );
 
 VOID MG5_RndResInit( VOID );
 #endif /* __RNDRES_H_ */

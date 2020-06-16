@@ -54,7 +54,7 @@ static VOID MG5_UnitInit( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
                     RUSSIAN_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
                     ANTIALIASED_QUALITY, FF_SWISS | VARIABLE_PITCH, "Consolas");
   hFntOld = SelectObject(Ani->hDC, hFnt);
-  wglUseFontBitmaps(Ani->hDC, 0, 30, 30);
+  wglUseFontBitmaps(Ani->hDC, 0, 256, 102);
   SelectObject(Ani->hDC, hFntOld);
   DeleteObject(hFnt);
 } /* End of 'MG5_UnitInit' function */
@@ -138,7 +138,7 @@ static VOID MG5_UnitResponse( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
  */
 static VOID MG5_UnitRender( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
 {  
-  INT n[10], i, k = 3;
+  INT n[10], i, k = 18;
   MATR m = MatrOrtho(0, Ani->W - k, Ani->H - k, 0, -1, 1);
   static CHAR Buf[10][100];
  
@@ -150,6 +150,7 @@ static VOID MG5_UnitRender( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
                  glGetString(GL_SHADING_LANGUAGE_VERSION));
   glPushAttrib(GL_ALL_ATTRIB_BITS);
   glUseProgram(0);
+  glBindTexture(GL_TEXTURE_2D, 0);
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
   glLoadMatrixf(m.A[0]);
@@ -167,7 +168,7 @@ static VOID MG5_UnitRender( mg5UNIT_CTRL *Uni, mg5ANIM *Ani )
   }
   glPopAttrib();
 
-  glLineWidth(18);
+  glLineWidth(8);
   MG5_RndPrimDraw(&Uni->Axes, MatrIdentity());
   glLineWidth(1);
 } /* End of 'MG5_UnitRender' function */

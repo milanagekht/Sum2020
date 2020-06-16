@@ -4,7 +4,10 @@ typedef struct
 {
   MG5_UNIT_BASE_FIELDS;
   mg5PRIM Ball;
+  mg5PRIMS Model;
 } mg5UNIT_BALL;
+
+
 
 /* Bounce ball unit deinitialization function.
  * ARGUMENTS:
@@ -17,6 +20,7 @@ typedef struct
 static VOID MG5_UnitClose( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
 {
   MG5_RndPrimFree(&Uni->Ball);
+  MG5_RndPrimsFree(&Uni->Model);
 } /* End of 'MG5_UnitClose' function */
 
 /* Bounce ball unit initialization function.
@@ -33,11 +37,15 @@ static VOID MG5_UnitInit( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
   mg5MATERIAL mtl = MG5_RndMaterials[0];
 
   MG5_RndPrimCreateSphere(&Uni->Ball, VecSet1(0), 1000, 1000, 1000, 8 * 18, 8* 18);
-  mtl.Tex[0] = MG5_RndTexAdd("sky.bmp");                                
+  mtl.Tex[0] = MG5_RndTexAdd("sky1.bmp");
+  mtl.Ka = VecSet1(0);
   mtl.Kd = VecSet1(0.8);
   mtl.Ks = VecSet1(0.8);
   mtl.Ph = 90;
+  mtl.ShdNo = MG5_RndShdAdd("SKY");
   Uni->Ball.MtlNo = MG5_RndMtlAdd(&mtl);
+
+  MG5_RndPrimsLoad(&Uni->Model,"domik.g3dm");
 } /* End of 'MG5_UnitInit' function */
 
 /* Bounce ball unit inter frame events handle function.
@@ -62,6 +70,7 @@ static VOID MG5_UnitResponse( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
  */
 static VOID MG5_UnitRender( mg5UNIT_BALL *Uni, mg5ANIM *Ani )
 {
+  MG5_RndPrimsDraw(&Uni->Model, MatrScale(VecSet(0.1, 0.1, 0.1)));
   MG5_RndPrimDraw(&Uni->Ball, MatrIdentity());
 } /* End of 'MG5_UnitRender' function */
 

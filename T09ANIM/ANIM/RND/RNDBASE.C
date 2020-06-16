@@ -63,6 +63,11 @@ VOID MG5_RndInit( HWND hWnd )
   glEnable(GL_PRIMITIVE_RESTART);
   glPrimitiveRestartIndex(-1);
 
+  
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
+
   /* Set default parameters */
   MG5_RndFrameH = 102;
   MG5_RndFrameW = 102;
@@ -72,6 +77,8 @@ VOID MG5_RndInit( HWND hWnd )
 
   MG5_RndProjSet();
   MG5_RndCamSet(VecSet(12, 8, 20), VecSet(0, 0, 0), VecSet(0, 1, 0));
+
+  MG5_RndResInit();
 } /* End of 'MG5_RndInit' function */
 
 
@@ -124,12 +131,16 @@ VOID MG5_RndCopyFrame( VOID )
  */
 VOID MG5_RndStart( VOID )
 {
+#ifndef NDEBUG
   INT t;
   static LONG reload_time = -1;
-#ifndef NDEBUG
+
   /* Reload shader */
   if ((t = clock() - reload_time ) > 5 * CLOCKS_PER_SEC)
-     MG5_RndShdUpdate();
+  {
+    MG5_RndShdUpdate();
+    reload_time = t;
+  }
 #endif /* NDEBUG */
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

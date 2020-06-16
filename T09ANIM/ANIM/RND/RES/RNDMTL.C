@@ -44,10 +44,17 @@ VOID MG5_RndMtlClose( VOID )
     memset(&MG5_RndMaterials[i], 0, sizeof(mg5MATERIAL));
 } /* End of 'MG5_RndMtlClose' function */
 
+
+/* Add material function.
+ * ARGUMENTS:
+ *        mtl.
+ * RETURNS:
+ *   (INT) added texture table number.
+ */
 INT MG5_RndMtlAdd( mg5MATERIAL *Mtl )
 {
 /* Checking free space */
-  if (MG5_RndMaterialsSize >= MG5_MAX_TEXTURES)
+  if (MG5_RndMaterialsSize >= MG5_MAX_MATERIALS)
     return -1;
 
   MG5_RndMaterials[MG5_RndMaterialsSize] = *Mtl;
@@ -75,7 +82,6 @@ INT MG5_RndMtlApply( INT MtlNo )
   prg = mtl->ShdNo;
   if (prg < 0 || prg >= MG5_RndShadersSize)
     prg = 0;
-  else
     prg = MG5_RndShaders[prg].ProgId;
 
   glUseProgram(prg);
@@ -111,6 +117,28 @@ INT MG5_RndMtlApply( INT MtlNo )
   }
   return prg;
 } /* End of 'MG5_RndMtlApply' function */
+
+/* Get default material  function.
+ * ARGUMENTS:  
+ *            None.
+ */
+mg5MATERIAL MG5_RndMtlGetDef( VOID )
+{
+  return MG5_RndMaterials[0];
+}
+
+/* Get material pointer by material table number function.
+ * ARGUMENTS:  
+ *            number of material at material table.
+ */
+mg5MATERIAL * MG5_RndMtlGet( INT MtlNo )
+{
+  /* Get material pointer */
+  if (MtlNo < 0 || MtlNo >= MG5_RndMaterialsSize)
+    MtlNo = 0;
+  return &MG5_RndMaterials[MtlNo];
+}
+
 
 
 /* END OF 'RNDMTL.C' FILE */

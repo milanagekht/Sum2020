@@ -188,7 +188,7 @@ BOOL MG5_RndPrimCreateSphere( mg5PRIM *Pr, VEC C, DBL RX, DBL RY, DBL RZ, INT Sp
         z = cos(phi) * sin(theta);
 
       V[k].P = VecSet(C.X + RX * x, C.Y + RY * y, C.Z + RZ * z);
-      V[k].T = Vec2Set(C.X + RX * x, C.Y + RY * y);
+      V[k].T = Vec2Set(j / (SplitW - 1.0), -i / (SplitH - 1.0));
       V[k].N = VecSet(x, y, z);
       V[k].C = Vec4Set1(0);
       k++;

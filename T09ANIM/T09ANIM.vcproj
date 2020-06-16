@@ -260,6 +260,10 @@
 							>
 						</File>
 						<File
+							RelativePath=".\ANIM\RND\RNDPRIMS.C"
+							>
+						</File>
+						<File
 							RelativePath=".\ANIM\RND\RES\RNDRES.C"
 							>
 						</File>

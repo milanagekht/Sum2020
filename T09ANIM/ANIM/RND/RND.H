@@ -76,6 +76,15 @@ typedef struct tagmg5PRIM
 } mg5PRIM;
 
 
+typedef struct tagmg5PRIMS
+{
+  INT NumOfPrims; /* Number of primitives in array */  
+  mg5PRIM *Prims; /* Array of primitives */
+  MATR Trans;     /* Common transformation matrix */
+} mg5PRIMS;
+
+
+
 /* Render system initialisation function.
  * ARGUMENTS:
  *   - HWND:
@@ -248,6 +257,47 @@ BOOL MG5_RndPrimCreateTorus( mg5PRIM *Pr, VEC C, DBL RX, DBL r, INT SplitW, INT 
  */
 BOOL MG5_RndPrimCreateFromGrid( mg5PRIM *Pr, mg5VERTEX *V, INT W, INT H, BOOL IsNormalsNeed );
 
+
+
+/* Create array of primitives function.
+ * ARGUMENTS:
+ *   - pointer to primitives structure:
+ *       mg5PRIMS *Prs;
+ *   - number of primitives to be add:
+ *       INT NumOfPrims;
+ * RETURNS:
+ *   (BOOL) TRUE if successful, FALSE otherwise.
+ */
+BOOL MG5_RndPrimsCreate( mg5PRIMS *Prs, INT NumOfPrims );
+
+/* Delete array of primitives function.
+ * ARGUMENTS:
+ *   - pointer to primitives structure:
+ *       mg5PRIMS *Prs;
+ * RETURNS: None.
+ */
+VOID MG5_RndPrimsFree( mg5PRIMS *Prs );
+
+/* Draw array of primitives function.
+ * ARGUMENTS:
+ *   - pointer to primitives structure:
+ *       mg5PRIMS *Prs;
+ *   - global transformation matrix:
+ *       MATR World;
+ * RETURNS: None.
+ */
+VOID MG5_RndPrimsDraw( mg5PRIMS *Prs, MATR World );
+
+/* Load array of primitives from .G3DM file function.
+ * ARGUMENTS:
+ *   - pointer to primitives structure:
+ *       mg5PRIMS *Prs;
+ *   - file name:
+ *       CHAR *FileName;
+ * RETURNS:
+ *   (BOOL) TRUE if successful, FALSE otherwise.
+ */
+BOOL MG5_RndPrimsLoad( mg5PRIMS *Prs, CHAR *FileName );
 
 
 #endif /* __DEF_H_ */

@@ -18,7 +18,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   HWND hWnd;
   MSG msg;
   WNDCLASS wc;
-  INT i;
+  //INT i;
 
   SetDbgMemHooks();
 
@@ -46,7 +46,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
       NULL, NULL, hInstance, NULL);
 
-  for (i = 0; i < 30; i++)
+  //for (i = 0; i < 30; i++)
      MG5_AnimUnitAdd(MG5_UnitCreateBall());
   /*MG5_AnimUnitAdd(MG5_UnitCreateCow());*/ 
   MG5_AnimUnitAdd(MG5_UnitCreateControl());
